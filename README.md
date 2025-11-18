@@ -3,5 +3,15 @@
 
 Potrebné veci : 
 
-GitHub account 
-Vscode
+
+
+
+GitHub account
+Vscode install - Wsl, Live Server
+Git install
+
+
+
+
+
+
