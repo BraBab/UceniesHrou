@@ -1,0 +1,26 @@
+h1 {
+    color:yellow
+}
+
+.container {
+    margin:0 auto;
+    background-color: blue;
+    border-radius: 15px;
+    max-width: 1200px;
+    text-align: center;
+}
+img {
+    width: 1000px;
+    display: block;
+    margin:auto;
+}
+.footer {
+    margin:0 auto;
+    background-color: blue;
+    border-radius: 15px;
+    max-width: 1200px;
+    text-align: center;
+}
+p {
+    color: yellow;
+}
