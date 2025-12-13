@@ -32,24 +32,136 @@
 
         <div id="popup" class="popup">
             <div class="popup-content">
-                <span class="close" onclick="closePopup()">
-                    &times;
-                </span>
-                <p id="popup-text">
-
-                </p>
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2 id="task-title"></h2>
+                <div id="question-text"></div>
+                <div id="choices"></div>
+                <button id="submit-answer">Odoslať</button>
+                <div id="feedback"></div>
             </div>
         </div>
 
         <script>
-            function showTask(city) {
-                document.getElementById("popup-text").innerText = "Uloha pre mesto " + city;
-                document.getElementById("popup").style.display = "flex";
+            // Zoznam otázok. Každé mesto (kľúč) môže mať svoju otázku a odpovede.
+            const questions = {
+                "Kosice": {
+                    question: "Ktoré mesto je hlavným mestom Slovenska?",
+                    choices: {
+                        A: "Bratislava",
+                        B: "Košice",
+                        C: "Prešov",
+                        D: "Žilina"
+                    },
+                    correct: "A"
+                },
+                "Presov": {
+                    question: "Ktore je najstarse mesto slovenska?",
+                    choices: {
+                        A: "Bratislava",
+                        B: "Košice",
+                        C: "Nitra",
+                        D: "Žilina"
+                    },
+                    correct: "C"
+                }
+            };
+            // Aktuálne otvorené mesto (udržiava stav medzi renderom a odoslaním odpovede)
+            let currentCity = null;
 
+            // renderQuestion vykreslí obsah popupu pre vybrané mesto
+            function renderQuestion(city) {
+                // uložíme si, ktoré mesto práve zobrazujeme
+                currentCity = city;
+
+                // získať dáta a elementy z DOM
+                const q = questions[city];
+                const title = document.getElementById('task-title');
+                const qText = document.getElementById('question-text');
+                const choicesDiv = document.getElementById('choices');
+                const feedback = document.getElementById('feedback');
+
+                // vyčistíme predchádzajúci obsah (pretože používame jeden popup pre všetky otázky)
+                feedback.innerText = '';
+                choicesDiv.innerHTML = '';
+
+                // nastaviť názov popupu
+                title.innerText = 'Úloha pre mesto ' + city;
+
+                // ak pre mesto nie je otázka pripravená, vypíšeme správu a skryjeme tlačidlo
+                if (!q) {
+                    qText.innerText = 'Pre toto mesto ešte nie je pripravená úloha.';
+                    document.getElementById('submit-answer').style.display = 'none';
+                    return;
+                }
+// vypíšeme text otázky
+                qText.innerText = q.question;
+
+                // Vytvorenie HTML pre každú voľbu (rádiá pre ABCD).
+                for (const key of Object.keys(q.choices)) {
+                    const id = 'choice-' + key; // unikátne id pre label
+                    const wrapper = document.createElement('div');
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'answer';
+                    radio.id = id;
+                    radio.value = key;
+
+                    const label = document.createElement('label');
+                    label.htmlFor = id;
+                    label.innerText = key + ': ' + q.choices[key];
+
+                    // pridať rádio a label do wrapperu a potom wrapper do hlavného kontajnera
+                    wrapper.appendChild(radio);
+                    wrapper.appendChild(label);
+                    choicesDiv.appendChild(wrapper);
+                }
+
+                // zobraziť tlačidlo odoslania (ak bolo predtým skryté)
+                document.getElementById('submit-answer').style.display = 'inline-block';
             }
+            // showTask otvorí popup pre dané mesto - volá renderQuestion
+            function showTask(city) {
+                renderQuestion(city);
+                // zobrazíme overlay. Flex zabezpečí centrovanie popup-content (viac info: prečo flex?)
+                document.getElementById('popup').style.display = 'flex';
+            }
+
+            // closePopup skryje popup a vyčistí stav
             function closePopup() {
-                document.getElementById("popup").style.display = "none";
+                document.getElementById('popup').style.display = 'none';
+                document.getElementById('task-title').innerText = '';
+                document.getElementById('question-text').innerText = '';
+                document.getElementById('choices').innerHTML = '';
+                document.getElementById('feedback').innerText = '';
+                currentCity = null;
             }
+            // Handler pre tlačidlo odoslať - vyhodnotí odpoveď
+            document.getElementById('submit-answer').onclick = function () {
+                const q = questions[currentCity];
+                if (!q) return; // ak nie je definované
+
+                // zobrazený kontajner pre feedback
+                const feedback = document.getElementById('feedback');
+                // získať vybrané rádio
+                const radios = document.getElementsByName('answer');
+                let selected = null;
+                for (const r of radios) {
+                    if (r.checked) selected = r.value;
+                }
+
+                // jednoduché overenie - ak nič nezvolili, vypíšeme upozornenie
+                if (!selected) {
+                    feedback.innerText = 'Vyber najprv odpoveď.';
+                    return;
+                }
+
+                // porovnanie s odpoveďou v objekte questions
+                if (selected === q.correct) {
+                    feedback.innerText = 'Správne!';
+                } else {
+                    feedback.innerText = 'Nesprávne';
+                }
+            };
         </script>
 </body>
 

@@ -59,3 +59,17 @@ p {
     float: right;
     font-size: 28px;
 }
+#submit-answer {
+    margin-top:10px;
+}
+
+#feedback {
+    margin-top:10px;
+    font-weight: bold;
+}
+
+#choices {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
