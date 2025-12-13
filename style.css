@@ -1,9 +1,9 @@
 h1 {
-    color:yellow
+    color: yellow;
 }
 
 .container {
-    margin:0 auto;
+    margin: 0 auto;
     background-color: blue;
     border-radius: 15px;
     max-width: 1200px;
@@ -12,10 +12,10 @@ h1 {
 img {
     width: 1000px;
     display: block;
-    margin:auto;
+    margin: auto;
 }
 .footer {
-    margin:0 auto;
+    margin: 0 auto;
     background-color: blue;
     border-radius: 15px;
     max-width: 1200px;
@@ -24,20 +24,19 @@ img {
 p {
     color: yellow;
 }
-.content{
-    position :relative;
+.content {
+    position: relative;
     width: 1000px;
-    margin:auto;
-
+    margin: auto;
 }
 .point {
-    position:absolute;
+    position: absolute;
     width: 20px;
-   background-color: brown;
+    background-color: brown;
     height: 20px;
     cursor: pointer;
 }
-.popup{
+.popup {
     display: none;
     position: fixed;
     top: 0;
@@ -48,14 +47,13 @@ p {
     justify-content: center;
     align-items: center;
 }
-.popup-content{
+.popup-content {
     background: white;
     padding: 20px;
     min-width: 300px;
     text-align: center;
-    
 }
-.close{
+.close {
     cursor: pointer;
     float: right;
     font-size: 28px;

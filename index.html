@@ -1,62 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head> 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ucenie sa Hrou</title> 
-<link rel="stylesheet" href="style.css">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ucenie sa Hrou</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-
-
-
-    </head>
 <body>
-<div class="container">
-    <header>
-        <h1>
-        Ucenia sa hrou 
-        </h1>
-    </header>
+    <div class="container">
+        <header>
+            <h1>
+                Ucenia sa hrou
+            </h1>
+        </header>
 
-<h1 style="color:green;">Hi</h1>
-
-</div>
-<div class="content">
-    <img src="./assets/slovakiamap.jpg">
-    <div class="point" style="top:400px;left:100px;" onclick="showTask('Presov')"> 
- <div class="point" style="top:50px;left:150px;" onclick="showTask('Kosice')"> 
+        <h1 style="color:green;">Hi</h1>
 
     </div>
-</div>
-<div class="footer">
-    <footer>
-        <p>made by spsd ke hlavna 113</p>
-    </footer>
-    
+    <div class="content">
+        <img src="./assets/slovakiamap.jpg">
+        <div class="point" style="top:400px;left:100px;" onclick="showTask('Presov')">
+            <div class="point" style="top:50px;left:150px;" onclick="showTask('Kosice')">
 
-</div>
+            </div>
+        </div>
 
-<div id="popup" class="popup">
-    <div class="popup-content">
-        <span class="close" onclick="closePopup()">
-           &times; 
-        </span>
-        <p id="popup-text">
+        <div class="footer">
+            <footer>
+                <p>made by spsd ke hlavna 113</p>
+            </footer>
+        </div>
 
-        </p>
-    </div>
-</div>
-<script>
-    function showTask(city){
-        document.getElementById("popup-text").innerText = "uloha pre mesto" + city;
-        document.getElementById("popup").style.display = "flex";
-    
-    }
-    function closePopup(){
-        document.getElementById("popup").style.display = "none";
-    }
-</script>
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">
+                    &times;
+                </span>
+                <p id="popup-text">
+
+                </p>
+            </div>
+        </div>
+        
+        <script>
+            function showTask(city) {
+                document.getElementById("popup-text").innerText = "uloha pre mesto" + city;
+                document.getElementById("popup").style.display = "flex";
+
+            }
+            function closePopup() {
+                document.getElementById("popup").style.display = "none";
+            }
+        </script>
 </body>
-</html>
 
+</html>
