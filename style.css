@@ -35,6 +35,7 @@ p {
     background-color: brown;
     height: 20px;
     cursor: pointer;
+    border-radius: 50%;
 }
 .popup {
     display: none;

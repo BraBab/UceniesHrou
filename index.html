@@ -21,11 +21,8 @@
     </div>
     <div class="content">
         <img src="./assets/slovakiamap.jpg">
-        <div class="point" style="top:400px;left:100px;" onclick="showTask('Presov')">
-            <div class="point" style="top:50px;left:150px;" onclick="showTask('Kosice')">
-
-            </div>
-        </div>
+        <div class="point" style="top:300px;left:720px;" onclick="showTask('Kosice')"></div>
+        <div class="point" style="top:200px;left:720px;" onclick="showTask('Presov')"></div>
 
         <div class="footer">
             <footer>
@@ -43,10 +40,10 @@
                 </p>
             </div>
         </div>
-        
+
         <script>
             function showTask(city) {
-                document.getElementById("popup-text").innerText = "uloha pre mesto" + city;
+                document.getElementById("popup-text").innerText = "Uloha pre mesto " + city;
                 document.getElementById("popup").style.display = "flex";
 
             }
