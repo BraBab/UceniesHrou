@@ -73,3 +73,35 @@ p {
     flex-direction: column;
     align-items: start;
 }
+.drag-container {
+    display: flex;
+    gap: 30px;
+}
+
+.questions, .answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropzone {
+    border: 2px dashed #555;
+    padding: 10px;
+    min-height: 40px;
+    background: #f9f9f9;
+}
+
+.draggable {
+    padding: 10px;
+    background: #cce5ff;
+    cursor: grab;
+}
+
+/* === TEXT V POPUP === */
+.popup-content,
+.popup-content h2,
+.popup-content p,
+#question-text,
+#choices {
+    color: #000000;
+}

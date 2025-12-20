@@ -23,7 +23,7 @@
         <img src="./assets/slovakiamap.jpg">
         <div class="point" style="top:300px;left:720px;" onclick="showTask('Kosice')"></div>
         <div class="point" style="top:200px;left:720px;" onclick="showTask('Presov')"></div>
-        <div class="point" style="top:58%; left:10%;" onclick="showTask('Bratislava')"></div>
+        <div class="point" style="top:375px; left:120px;" onclick="showTask('Bratislava')"></div>
         <div class="point" style="top:52%; left:15%;" onclick="showTask('Trnava')"></div>
         <div class="point" style="top:45%; left:30%;" onclick="showTask('Trencin')"></div>
         <div class="point" style="top:60%; left:25%;" onclick="showTask('Nitra')"></div>
@@ -50,6 +50,7 @@
             // Zoznam otázok. Každé mesto (kľúč) môže mať svoju otázku a odpovede.
             const questions = {
                 "Kosice": {
+                    type:"choice",
                     question: "Ktoré mesto je hlavným mestom Slovenska?",
                     choices: {
                         A: "Bratislava",
@@ -60,112 +61,250 @@
                     correct: "A"
                 },
                 "Presov": {
+                    type:"drag",
                     question: "Ktore je najstarse mesto slovenska?",
-                    choices: {
-                        A: "Bratislava",
-                        B: "Košice",
-                        C: "Nitra",
-                        D: "Žilina"
-                    },
-                    correct: "C"
+                    pairs: [
+                        { q: "Hlavné mesto Slovenska", a: "Bratislava" },
+                        { q: "Najstaršie mesto Slovenska", a: "Nitra" },
+                        { q: "Najvyššie pohorie", a: "Tatry" },
+                        { q: "Najdlhšia rieka", a: "Dunaj" }
+                    ]
+                    
+                },
+                "Bratislava": {
+                    type:"fill",
+                    question: "dopovny chybajuce slovo?",
+                    sentence: "Hlavne mesto slovenska je ___ a lezi na rieke ___.",
+                    answers: ["Bratislava", "Dunaj"]
                 }
             };
             // Aktuálne otvorené mesto (udržiava stav medzi renderom a odoslaním odpovede)
             let currentCity = null;
-
-            // renderQuestion vykreslí obsah popupu pre vybrané mesto
-            function renderQuestion(city) {
-                // uložíme si, ktoré mesto práve zobrazujeme
+                function showTask(city) {
                 currentCity = city;
-
-                // získať dáta a elementy z DOM
-                const q = questions[city];
-                const title = document.getElementById('task-title');
-                const qText = document.getElementById('question-text');
-                const choicesDiv = document.getElementById('choices');
-                const feedback = document.getElementById('feedback');
-
-                // vyčistíme predchádzajúci obsah (pretože používame jeden popup pre všetky otázky)
-                feedback.innerText = '';
-                choicesDiv.innerHTML = '';
-
-                // nastaviť názov popupu
-                title.innerText = 'Úloha pre mesto ' + city;
-
-                // ak pre mesto nie je otázka pripravená, vypíšeme správu a skryjeme tlačidlo
-                if (!q) {
-                    qText.innerText = 'Pre toto mesto ešte nie je pripravená úloha.';
-                    document.getElementById('submit-answer').style.display = 'none';
-                    return;
-                }
-// vypíšeme text otázky
-                qText.innerText = q.question;
-                // Vytvorenie HTML pre každú voľbu (rádiá pre ABCD).
-                for (const key of Object.keys(q.choices)) {
-                    const id = 'choice-' + key; // unikátne id pre label
-                    const wrapper = document.createElement('div');
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = 'answer';
-                    radio.id = id;
-                    radio.value = key;
-
-                    const label = document.createElement('label');
-                    label.htmlFor = id;
-                    label.innerText = key + ': ' + q.choices[key];
-
-                    // pridať rádio a label do wrapperu a potom wrapper do hlavného kontajnera
-                    wrapper.appendChild(radio);
-                    wrapper.appendChild(label);
-                    choicesDiv.appendChild(wrapper);
-                }
-
-                // zobraziť tlačidlo odoslania (ak bolo predtým skryté)
-                document.getElementById('submit-answer').style.display = 'inline-block';
-            }
-            // showTask otvorí popup pre dané mesto - volá renderQuestion
-            function showTask(city) {
                 renderQuestion(city);
-                // zobrazíme overlay. Flex zabezpečí centrovanie popup-content (viac info: prečo flex?)
-                document.getElementById('popup').style.display = 'flex';
+                document.getElementById("popup").style.display = "flex";
             }
 
-            // closePopup skryje popup a vyčistí stav
             function closePopup() {
-                document.getElementById('popup').style.display = 'none';
-                document.getElementById('task-title').innerText = '';
-                document.getElementById('question-text').innerText = '';
-                document.getElementById('choices').innerHTML = '';
-                document.getElementById('feedback').innerText = '';
-                currentCity = null;
+                document.getElementById("popup").style.display = "none";
+                document.getElementById("choices").innerHTML = "";
+                document.getElementById("feedback").innerText = "";
             }
-            // Handler pre tlačidlo odoslať - vyhodnotí odpoveď
-            document.getElementById('submit-answer').onclick = function () {
-                const q = questions[currentCity];
-                if (!q) return; // ak nie je definované
+            function renderQuestion(city) {
+            const q = questions[city];
 
-                // zobrazený kontajner pre feedback
-                const feedback = document.getElementById('feedback');
-                // získať vybrané rádio
-                const radios = document.getElementsByName('answer');
-                let selected = null;
-                for (const r of radios) {
-                    if (r.checked) selected = r.value;
-                }
+            document.getElementById("task-title").innerText =
+                "Úloha pre mesto " + city;
 
-                // jednoduché overenie - ak nič nezvolili, vypíšeme upozornenie
+            document.getElementById("question-text").innerText =
+                q.question;
+
+            document.getElementById("choices").innerHTML = "";
+            document.getElementById("feedback").innerText = "";
+
+            if (q.type === "choice") {
+                renderChoiceQuestion(q);
+            }
+
+            if (q.type === "drag") {
+                renderDragQuestion(q);
+            }
+
+            if (q.type === "fill") {
+                renderFillQuestion(q);
+            }
+    }
+        function renderChoiceQuestion(q) {
+
+            // Kontajner, kde sa zobrazia možnosti odpovede
+            const container = document.getElementById("choices");
+
+            // Tlačidlo na odoslanie odpovede
+            const submitBtn = document.getElementById("submit-answer");
+
+            // Zobrazíme tlačidlo (pri inom type otázky môže byť skryté)
+            submitBtn.style.display = "inline-block";
+
+            // Prejdeme všetky možnosti (A, B, C, D)
+            for (const key in q.choices) {
+
+                // Dynamicky vytvárame HTML pre každú odpoveď
+                container.innerHTML += `
+                    <div>
+                        <!-- radio input zabezpečí, že môžeme vybrať iba jednu odpoveď -->
+                        <input type="radio" name="answer" value="${key}">
+                        ${key}: ${q.choices[key]}
+                    </div>
+                `;
+            }
+
+            // Logika po kliknutí na tlačidlo "Odoslať"
+            submitBtn.onclick = function () {
+
+                // Nájdeme označenú odpoveď
+                const selected =
+                    document.querySelector('input[name="answer"]:checked');
+
+                // Ak používateľ nič nevybral
                 if (!selected) {
-                    feedback.innerText = 'Vyber najprv odpoveď.';
+                    document.getElementById("feedback").innerText =
+                        "Vyber odpoveď!";
                     return;
                 }
 
-                // porovnanie s odpoveďou v objekte questions
-                if (selected === q.correct) {
-                    feedback.innerText = 'Správne!';
-                } else {
-                    feedback.innerText = 'Nesprávne';
-                }
+                // Porovnanie vybratej odpovede so správnou
+                document.getElementById("feedback").innerText =
+                    selected.value === q.correct ? "Správne!" : "Nesprávne";
             };
+        }
+        function renderDragQuestion(q) {
+
+    // Kontajner pre obsah otázky
+    const container = document.getElementById("choices");
+
+    // Skryjeme hlavné tlačidlo (použijeme vlastné)
+    document.getElementById("submit-answer").style.display = "none";
+
+    // Vytvoríme kópiu odpovedí a premiešame ich
+    const answers = [...q.pairs].sort(() => Math.random() - 0.5);
+
+    // Vytvoríme HTML štruktúru drag & drop otázky
+    container.innerHTML = `
+        <div class="drag-container">
+
+            <!-- Ľavá strana – otázky (drop zóny) -->
+            <div class="questions">
+                ${q.pairs.map(p =>
+                    `<div class="dropzone" data-answer="${p.a}">
+                        ${p.q}
+                    </div>`).join("")}
+            </div>
+
+            <!-- Pravá strana – odpovede (ťahateľné prvky) -->
+            <div class="answers">
+                ${answers.map(a =>
+                    `<div class="draggable" draggable="true">
+                        ${a.a}
+                    </div>`).join("")}
+            </div>
+        </div>
+
+        <!-- Tlačidlo na kontrolu odpovedí -->
+        <button onclick="checkDragAnswers()">Odoslať</button>
+    `;
+}
+/**********************************************************
+ * 6️⃣ DRAG & DROP LOGIKA
+ **********************************************************/
+
+// Spustí sa pri začatí ťahania
+document.addEventListener("dragstart", e => {
+    if (e.target.classList.contains("draggable")) {
+        draggedItem = e.target;
+    }
+});
+
+// Umožníme pustiť prvok do drop zóny
+document.addEventListener("dragover", e => {
+    if (e.target.classList.contains("dropzone")) {
+        e.preventDefault();
+    }
+});
+
+// Logika po pustení prvku
+document.addEventListener("drop", e => {
+    if (e.target.classList.contains("dropzone")) {
+        e.preventDefault();
+
+        // Vložíme text odpovede do drop zóny
+        e.target.innerText = draggedItem.innerText;
+
+        // Uložíme používateľovu odpoveď
+        e.target.dataset.user = draggedItem.innerText;
+    }
+});
+
+/**********************************************************
+ * Kontrola odpovedí drag & drop
+ **********************************************************/
+function checkDragAnswers() {
+
+    // Nájdeme všetky drop zóny
+    const zones = document.querySelectorAll(".dropzone");
+    let correct = 0;
+
+    // Skontrolujeme každú zónu
+    zones.forEach(z => {
+
+        // Porovnáme odpoveď používateľa so správnou
+        if (z.dataset.user === z.dataset.answer) {
+            z.style.background = "#c8e6c9"; // zelená
+            correct++;
+        } else {
+            z.style.background = "#ffcdd2"; // červená
+        }
+    });
+
+    // Zobrazíme výsledok
+    document.getElementById("feedback").innerText =
+        `Správne: ${correct} / ${zones.length}`;
+}
+function renderFillQuestion(q) {
+
+    // Kontajner pre otázku
+    const container = document.getElementById("choices");
+
+    // Tlačidlo na odoslanie
+    const submitBtn = document.getElementById("submit-answer");
+
+    // Zobrazíme tlačidlo
+    submitBtn.style.display = "inline-block";
+
+    // Rozdelíme vetu podľa ___
+    const parts = q.sentence.split("___");
+
+    let html = "<p>";
+
+    // Vytvoríme vetu s input políčkami
+    parts.forEach((part, i) => {
+        html += part;
+
+        // Za každý ___ vložíme input
+        if (i < q.answers.length) {
+            html += `<input type="text" class="fill-input" data-index="${i}">`;
+        }
+    });
+
+    html += "</p>";
+    container.innerHTML = html;
+
+    // Logika po kliknutí na "Odoslať"
+    submitBtn.onclick = function () {
+
+        // Nájdeme všetky input polia
+        const inputs = document.querySelectorAll(".fill-input");
+        let correct = true;
+
+        inputs.forEach((input, i) => {
+
+            // Porovnanie odpovede bez ohľadu na veľké/malé písmená
+            if (
+                input.value.trim().toLowerCase() !==
+                q.answers[i].toLowerCase()
+            ) {
+                correct = false;
+                input.style.background = "#ffcdd2"; // červená
+            } else {
+                input.style.background = "#c8e6c9"; // zelená
+            }
+        });
+
+        // Zobrazenie výsledku
+        document.getElementById("feedback").innerText =
+            correct ? "Správne!" : "Niektoré odpovede sú nesprávne.";
+    };
+}
         </script>
 </body>
 
