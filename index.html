@@ -20,6 +20,13 @@
 
     </div>
     <div class="content">
+        <div class="controls" style="margin-bottom:8px;">
+            <label for="question-set-select">Vyber sadu otázok:</label>
+            <select id="question-set-select">
+                <option value="questions_set_19_8" selected>2019 - ukážka 8</option>
+                <option value="questions_set_19_7">2019 - ukážka 7</option>
+            </select>
+        </div>
         <img src="./assets/image.png">
         <div class="point" style="top:300px;left:720px;" onclick="showTask('Kosice')"></div>
         <div class="point" style="top:200px;left:720px;" onclick="showTask('Presov')"></div>
@@ -39,45 +46,30 @@
             <div class="popup-content">
                 <span class="close" onclick="closePopup()">&times;</span>
                 <h2 id="task-title"></h2>
+                <div id="popup-text" class="popup-text"></div>
                 <div id="question-text"></div>
                 <div id="choices"></div>
                 <button id="submit-answer">Odoslať</button>
                 <div id="feedback"></div>
             </div>
         </div>
-
+        <script src="./questions_sets/questions_set_19_8.js"></script>
+        <script src="./questions_sets/questions_set_19_7.js"></script>
         <script>
-            // Zoznam otázok. Každé mesto (kľúč) môže mať svoju otázku a odpovede.
-            const questions = {
-                "Kosice": {
-                    type:"choice",
-                    question: "Ktoré mesto je hlavným mestom Slovenska?",
-                    choices: {
-                        A: "Bratislava",
-                        B: "Košice",
-                        C: "Prešov",
-                        D: "Žilina"
-                    },
-                    correct: "A"
-                },
-                "Presov": {
-                    type:"drag",
-                    question: "Ktore je najstarse mesto slovenska?",
-                    pairs: [
-                        { q: "Hlavné mesto Slovenska", a: "Bratislava" },
-                        { q: "Najstaršie mesto Slovenska", a: "Nitra" },
-                        { q: "Najvyššie pohorie", a: "Tatry" },
-                        { q: "Najdlhšia rieka", a: "Dunaj" }
-                    ]
-                    
-                },
-                "Bratislava": {
-                    type:"fill",
-                    question: "dopovny chybajuce slovo?",
-                    sentence: "Hlavne mesto slovenska je ___ a lezi na rieke ___.",
-                    answers: ["Bratislava", "Dunaj"]
+            let questions = {};
+
+            function useQuestionSet(name) {
+                if (window[name]) {
+                    questions = window[name];
+                } else {
+                    questions = {};
                 }
-            };
+            }
+
+            // Inicializuj vybranú hodnotu
+            const selectEl = document.getElementById('question-set-select');
+            if (selectEl) useQuestionSet(selectEl.value);
+            if (selectEl) selectEl.addEventListener('change', e => useQuestionSet(e.target.value));
             // Aktuálne otvorené mesto (udržiava stav medzi renderom a odoslaním odpovede)
             let currentCity = null;
                 function showTask(city) {
@@ -93,7 +85,15 @@
             }
             function renderQuestion(city) {
             const q = questions[city];
-
+            if (!q) {
+                    document.getElementById("task-title").innerText =
+                        "Žiadna úloha pre mesto " + city;
+                    document.getElementById("question-text").innerText = "";
+                    document.getElementById("choices").innerHTML = "";
+                    document.getElementById("feedback").innerText = "";
+                    document.getElementById('submit-answer').style.display = 'none';
+                    return;
+                }
             document.getElementById("task-title").innerText =
                 "Úloha pre mesto " + city;
 
@@ -102,7 +102,7 @@
 
             document.getElementById("choices").innerHTML = "";
             document.getElementById("feedback").innerText = "";
-
+            renderOptionalText(q);
             if (q.type === "choice") {
                 renderChoiceQuestion(q);
             }
@@ -114,7 +114,22 @@
             if (q.type === "fill") {
                 renderFillQuestion(q);
             }
+            if (q.type === "openAnswer") {
+                    renderOpenAnswerQuestion(q);
+                }
     }
+    function renderOptionalText(q) {
+                const el = document.getElementById('popup-text');
+                if (!el) return;
+
+                if (q && q.requireText && questions.text) {
+                    el.innerText = questions.text;
+                    el.style.display = 'block';
+                } else {
+                    el.innerText = '';
+                    el.style.display = 'none';
+                }
+            }
         function renderChoiceQuestion(q) {
 
             // Kontajner, kde sa zobrazia možnosti odpovede
@@ -305,6 +320,39 @@ function renderFillQuestion(q) {
             correct ? "Správne!" : "Niektoré odpovede sú nesprávne.";
     };
 }
+function renderOpenAnswerQuestion(q) {
+                const container = document.getElementById('choices');
+                const submitBtn = document.getElementById('submit-answer');
+
+                // Vyčisti predchádzajúci obsah
+                container.innerHTML = '';
+                document.getElementById('feedback').innerText = '';
+                // Zobraziť tlačidlo odoslať
+                submitBtn.style.display = 'inline-block';
+
+                // Vytvoriť vstupné pole
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'open-answer-input';
+                input.name = 'open-answer-input';
+                input.placeholder = 'Napíšte odpoveď...';
+                container.appendChild(input);
+
+                // Logika po kliknutí na tlačidlo "Odoslať" - kontrola odpovede
+                submitBtn.onclick = function () {
+                    const val = input.value.trim().toLowerCase();
+                    const answers = (q.answers || []).map(a => a.toLowerCase());
+                    const correct = answers.includes(val);
+
+                    if (correct) {
+                        input.style.background = '#c8e6c9';
+                        document.getElementById('feedback').innerText = 'Správne!';
+                    } else {
+                        input.style.background = '#ffcdd2';
+                        document.getElementById('feedback').innerText = 'Nesprávne';
+                    }
+                };
+            }
         </script>
 </body>
 

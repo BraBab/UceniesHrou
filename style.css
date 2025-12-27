@@ -53,6 +53,7 @@ p {
     padding: 20px;
     min-width: 300px;
     text-align: center;
+    max-width: 60%;
 }
 .close {
     cursor: pointer;
@@ -104,4 +105,16 @@ p {
 #question-text,
 #choices {
     color: #000000;
+}
+.popup-text {
+  display: none;        /* hidden by default */
+  max-width: 50%;        /* limits line length */
+  width: 50%;              /* relative to container */
+  white-space: normal;     /* allow wrapping */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
+  margin: 0 auto 8px;
+  padding: 4px;
+  text-align: justify;
 }
