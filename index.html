@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,317 +8,234 @@
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>Ucenia sa hrou</h1>
-        </header>
+<div class="container">
+    <header>
+        <h1>Ucenia sa hrou</h1>
+    </header>
+</div>
+
+<div class="content">
+
+    <div class="game-ui">
+        <div>⭐ Skóre: <span id="score">0</span></div>
+        <div>📍 Navštívené: <span id="visited">0</span></div>
     </div>
 
-    <div class="content">
-
-        <!-- GAME UI -->
-        <div class="game-ui">
-            <div>⭐ Skóre: <span id="score">0</span></div>
-            <div>📍 Navštívené: <span id="visited">0</span></div>
-        </div>
-
-        <div class="controls" style="margin-bottom:8px;">
-            <label for="question-set-select">Vyber sadu otázok:</label>
-            <select id="question-set-select">
-                <option value="questions_set_19_8" selected>2019 - ukážka 8</option>
-                <option value="questions_set_19_7">2019 - ukážka 7</option>
-            </select>
-        </div>
-
-        <img src="./assets/image.png">
-
-        <div class="point" style="top: 400px;left:720px;" onclick="showTask('Kosice')"></div>
-        <div class="point" style="top:300px;left:720px;" onclick="showTask('Presov')"></div>
-        <div class="point" style="top:500px; left:120px;" onclick="showTask('Bratislava')"></div>
-        <div class="point" style="top:52%; left:20%;" onclick="showTask('Trnava')"></div>
-        <div class="point" style="top:45%; left:30%;" onclick="showTask('Trencin')"></div>
-        <div class="point" style="top:60%; left:25%;" onclick="showTask('Nitra')"></div>
-        <div class="point" style="top:30%; left:45%;" onclick="showTask('Zilina')"></div>
-        <div class="point" style="top:50%; left:52%;" onclick="showTask('BanskaBystrica')"></div>
-
-        <div class="footer">
-            <footer>
-                <p>made by spsd ke hlavna 113</p>
-            </footer>
-        </div>
-
-        <div id="popup" class="popup">
-            <div class="popup-content">
-                <span class="close" onclick="closePopup()">&times;</span>
-                <h2 id="task-title"></h2>
-                <div id="popup-text" class="popup-text"></div>
-                <div id="question-text"></div>
-                <div id="choices"></div>
-                <button id="submit-answer">Odoslať</button>
-                <div id="feedback"></div>
-            </div>
-        </div>
-
-        <script src="./questions_sets/questions_set_19_8.js"></script>
-        <script src="./questions_sets/questions_set_19_7.js"></script>
-
-        <script>
-            let questions = {};
-
-            // === GAME STATE ===
-            let score = 0;
-            let visitedCities = new Set();
-
-            function updateUI() {
-                const el = document.getElementById("score");
-                el.innerText = score;
-                document.getElementById("visited").innerText = visitedCities.size;
-
-                el.classList.remove("score-anim");
-                void el.offsetWidth;
-                el.classList.add("score-anim");
-            }
-
-            function useQuestionSet(name) {
-                if (window[name]) {
-                    questions = window[name];
-                } else {
-                    questions = {};
-                }
-            }
-
-            const selectEl = document.getElementById('question-set-select');
-            if (selectEl) useQuestionSet(selectEl.value);
-            if (selectEl) selectEl.addEventListener('change', e => useQuestionSet(e.target.value));
-
-            let currentCity = null;
-
-            function showTask(city) {
-                currentCity = city;
-                visitedCities.add(city);
-                updateUI();
-                renderQuestion(city);
-                document.getElementById("popup").style.display = "flex";
-            }
-
-            function closePopup() {
-                document.getElementById("popup").style.display = "none";
-                document.getElementById("choices").innerHTML = "";
-                document.getElementById("feedback").innerText = "";
-            }
-
-            function renderQuestion(city) {
-                const q = questions[city];
-                if (!q) {
-                    document.getElementById("task-title").innerText =
-                        "Žiadna úloha pre mesto " + city;
-                    document.getElementById("question-text").innerText = "";
-                    document.getElementById("choices").innerHTML = "";
-                    document.getElementById("feedback").innerText = "";
-                    document.getElementById('submit-answer').style.display = 'none';
-                    return;
-                }
-
-                document.getElementById("task-title").innerText =
-                    "Úloha pre mesto " + city;
-
-                document.getElementById("question-text").innerText = q.question;
-
-                document.getElementById("choices").innerHTML = "";
-                document.getElementById("feedback").innerText = "";
-                renderOptionalText(q);
-
-                if (q.type === "choice") renderChoiceQuestion(q);
-                if (q.type === "drag") renderDragQuestion(q);
-                if (q.type === "fill") renderFillQuestion(q);
-                if (q.type === "openAnswer") renderOpenAnswerQuestion(q);
-            }
-
-            function renderOptionalText(q) {
-                const el = document.getElementById('popup-text');
-                if (!el) return;
-
-                if (q && q.requireText && questions.text) {
-                    el.innerText = questions.text;
-                    el.style.display = 'block';
-                } else {
-                    el.innerText = '';
-                    el.style.display = 'none';
-                }
-            }
-
-            function renderChoiceQuestion(q) {
-                const container = document.getElementById("choices");
-                const submitBtn = document.getElementById("submit-answer");
-                submitBtn.style.display = "inline-block";
-
-                for (const key in q.choices) {
-                    container.innerHTML += `
-                        <div>
-                            <input type="radio" name="answer" value="${key}">
-                            ${key}: ${q.choices[key]}
-                        </div>
-                    `;
-                }
-
-                submitBtn.onclick = function () {
-                    const selected =
-                        document.querySelector('input[name="answer"]:checked');
-
-                    if (!selected) {
-                        document.getElementById("feedback").innerText =
-                            "Vyber odpoveď!";
-                        return;
-                    }
-
-                    if (selected.value === q.correct) {
-                        document.getElementById("feedback").innerText = "Správne! +10";
-                        score += 10;
-                    } else {
-                        document.getElementById("feedback").innerText = "Nesprávne";
-                    }
-                    updateUI();
-                };
-            }
-
-            function renderDragQuestion(q) {
-                const container = document.getElementById("choices");
-                document.getElementById("submit-answer").style.display = "none";
-
-                const answers = [...q.pairs].sort(() => Math.random() - 0.5);
-
-                container.innerHTML = `
-                    <div class="drag-container">
-                        <div class="questions">
-                            ${q.pairs.map(p =>
-                                `<div class="dropzone" data-answer="${p.a}">${p.q}</div>`).join("")}
-                        </div>
-                        <div class="answers">
-                            ${answers.map(a =>
-                                `<div class="draggable" draggable="true">${a.a}</div>`).join("")}
-                        </div>
-                    </div>
-                    <button onclick="checkDragAnswers()">Odoslať</button>
-                `;
-            }
-
-            document.addEventListener("dragstart", e => {
-                if (e.target.classList.contains("draggable")) {
-                    draggedItem = e.target;
-                }
-            });
-
-            document.addEventListener("dragover", e => {
-                if (e.target.classList.contains("dropzone")) {
-                    e.preventDefault();
-                }
-            });
-
-            document.addEventListener("drop", e => {
-                if (e.target.classList.contains("dropzone")) {
-                    e.preventDefault();
-                    e.target.innerText = draggedItem.innerText;
-                    e.target.dataset.user = draggedItem.innerText;
-                }
-            });
-
-            function checkDragAnswers() {
-                const zones = document.querySelectorAll(".dropzone");
-                let correct = 0;
-
-                zones.forEach(z => {
-                    if (z.dataset.user === z.dataset.answer) {
-                        z.style.background = "#c8e6c9";
-                        correct++;
-                    } else {
-                        z.style.background = "#ffcdd2";
-                    }
-                });
-
-                score += correct * 5;
-                updateUI();
-
-                document.getElementById("feedback").innerText =
-                    `Správne: ${correct} / ${zones.length} (+${correct * 5})`;
-            }
-
-            function renderFillQuestion(q) {
-                const container = document.getElementById("choices");
-                const submitBtn = document.getElementById("submit-answer");
-                submitBtn.style.display = "inline-block";
-
-                const parts = q.sentence.split("___");
-                let html = "<p>";
-
-                parts.forEach((part, i) => {
-                    html += part;
-                    if (i < q.answers.length) {
-                        html += `<input type="text" class="fill-input">`;
-                    }
-                });
-
-                html += "</p>";
-                container.innerHTML = html;
-
-                submitBtn.onclick = function () {
-                    const inputs = document.querySelectorAll(".fill-input");
-                    let correct = true;
-
-                    inputs.forEach((input, i) => {
-                        if (
-                            input.value.trim().toLowerCase() !==
-                            q.answers[i].toLowerCase()
-                        ) {
-                            correct = false;
-                            input.style.background = "#ffcdd2";
-                        } else {
-                            input.style.background = "#c8e6c9";
-                        }
-                    });
-
-                    if (correct) {
-                        score += 10;
-                        document.getElementById("feedback").innerText = "Správne! +10";
-                    } else {
-                        document.getElementById("feedback").innerText = "Niektoré odpovede sú nesprávne.";
-                    }
-
-                    updateUI();
-                };
-            }
-
-            function renderOpenAnswerQuestion(q) {
-                const container = document.getElementById('choices');
-                const submitBtn = document.getElementById('submit-answer');
-
-                container.innerHTML = '';
-                document.getElementById('feedback').innerText = '';
-                submitBtn.style.display = 'inline-block';
-
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'open-answer-input';
-                input.placeholder = 'Napíšte odpoveď...';
-                container.appendChild(input);
-
-                submitBtn.onclick = function () {
-                    const val = input.value.trim().toLowerCase();
-                    const answers = (q.answers || []).map(a => a.toLowerCase());
-                    const correct = answers.includes(val);
-
-                    if (correct) {
-                        input.style.background = '#c8e6c9';
-                        document.getElementById('feedback').innerText = 'Správne! +10';
-                        score += 10;
-                    } else {
-                        input.style.background = '#ffcdd2';
-                        document.getElementById('feedback').innerText = 'Nesprávne';
-                    }
-
-                    updateUI();
-                };
-            }
-        </script>
+    <div class="controls" style="margin-bottom:8px;">
+        <label for="question-set-select">Vyber sadu otázok:</label>
+        <select id="question-set-select">
+            <option value="questions_set_19_8" selected>2019 - ukážka 8</option>
+            <option value="questions_set_19_7">2019 - ukážka 7</option>
+        </select>
     </div>
+
+    <img src="./assets/image.png">
+
+    <div class="point" data-city="Kosice" style="top:400px;left:720px;"></div>
+    <div class="point" data-city="Presov" style="top:300px;left:720px;"></div>
+    <div class="point" data-city="Bratislava" style="top:500px; left:120px;"></div>
+    <div class="point" data-city="Trnava" style="top:52%; left:20%;"></div>
+    <div class="point" data-city="Trencin" style="top:45%; left:30%;"></div>
+    <div class="point" data-city="Nitra" style="top:60%; left:25%;"></div>
+    <div class="point" data-city="Zilina" style="top:30%; left:45%;"></div>
+    <div class="point" data-city="BanskaBystrica" style="top:50%; left:52%;"></div>
+
+    <div class="footer">
+        <footer>
+            <p>made by spsd ke hlavna 113</p>
+        </footer>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <h2 id="task-title"></h2>
+            <div id="popup-text"></div>
+            <div id="question-text"></div>
+            <div id="choices"></div>
+            <button id="submit-answer">Odoslať</button>
+            <div id="feedback"></div>
+        </div>
+    </div>
+
+<script src="./questions_sets/questions_set_19_8.js"></script>
+<script src="./questions_sets/questions_set_19_7.js"></script>
+
+<script>
+let questions = {};
+let score = 0;
+let visitedCities = new Set();
+let answeredCities = new Set();
+let attempts = {};
+let currentCity = null;
+let currentPoint = null;
+
+const $ = id => document.getElementById(id);
+
+function updateUI(){
+    $("score").innerText = score;
+    $("visited").innerText = visitedCities.size;
+    $("score").classList.remove("score-anim");
+    void $("score").offsetWidth;
+    $("score").classList.add("score-anim");
+}
+
+function useQuestionSet(name){
+    if(window[name]) questions = window[name];
+}
+
+const selectEl = $("question-set-select");
+useQuestionSet(selectEl.value);
+selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
+
+document.querySelectorAll(".point").forEach(p=>{
+    p.addEventListener("click", ()=>showTask(p.dataset.city,p));
+});
+
+function showTask(city, el){
+    currentCity = city;
+    currentPoint = el;
+    if(!attempts[city]) attempts[city]=0;
+    visitedCities.add(city);
+    updateUI();
+    renderQuestion(city);
+    $("popup").style.display="flex";
+}
+
+function closePopup(){
+    $("popup").style.display="none";
+    $("choices").innerHTML="";
+    $("feedback").innerText="";
+}
+
+function renderQuestion(city){
+    const q = questions[city];
+    if(!q) return;
+
+    $("task-title").innerText="Úloha pre mesto "+city;
+    $("question-text").innerText=q.question;
+    $("choices").innerHTML="";
+    $("feedback").innerText="";
+
+    if(q.type==="choice") renderChoiceQuestion(q);
+    if(q.type==="fill") renderFillQuestion(q);
+    if(q.type==="openAnswer") renderOpenAnswerQuestion(q);
+}
+
+function calcPoints(){
+    if(attempts[currentCity]===1) return 10;
+    if(attempts[currentCity]===2) return 5;
+    if(attempts[currentCity]===3) return 2;
+    return 0;
+}
+
+/* ===== CHOICE ===== */
+function renderChoiceQuestion(q){
+    $("submit-answer").style.display="inline-block";
+
+    for(const key in q.choices){
+        $("choices").innerHTML+=`
+        <div class="choice">
+            <input type="radio" name="answer" value="${key}">
+            ${key}: ${q.choices[key]}
+        </div>`;
+    }
+
+    $("submit-answer").onclick=function(){
+        if(answeredCities.has(currentCity)) return;
+
+        const selected=document.querySelector('input[name="answer"]:checked');
+        if(!selected) return;
+
+        attempts[currentCity]++;
+
+        const chosen=selected.closest(".choice");
+
+        if(selected.value===q.correct){
+            let pts=calcPoints();
+            score+=pts;
+            chosen.classList.add("correct");
+            currentPoint.classList.add("correct");
+            $("feedback").innerText=pts?`Správne! +${pts}`:"Správne! (0 bodov)";
+            answeredCities.add(currentCity);
+        }else{
+            chosen.classList.add("wrong");
+            currentPoint.classList.add("wrong");
+            $("feedback").innerText="Nesprávne, skús znova";
+        }
+
+        updateUI();
+    };
+}
+
+/* ===== FILL ===== */
+function renderFillQuestion(q){
+    $("submit-answer").style.display="inline-block";
+    const parts=q.sentence.split("___");
+    let html="<p>";
+    parts.forEach((p,i)=>{
+        html+=p;
+        if(i<q.answers.length) html+=`<input class="fill-input">`;
+    });
+    html+="</p>";
+    $("choices").innerHTML=html;
+
+    $("submit-answer").onclick=function(){
+        if(answeredCities.has(currentCity)) return;
+        attempts[currentCity]++;
+        const inputs=document.querySelectorAll(".fill-input");
+        let ok=true;
+        inputs.forEach((inp,i)=>{
+            if(inp.value.trim().toLowerCase()!==q.answers[i].toLowerCase()){
+                ok=false; inp.style.background="#ffcdd2";
+            } else inp.style.background="#c8e6c9";
+        });
+
+        if(ok){
+            let pts=calcPoints();
+            score+=pts;
+            currentPoint.classList.add("correct");
+            $("feedback").innerText=`Správne! +${pts}`;
+            answeredCities.add(currentCity);
+        }else{
+            currentPoint.classList.add("wrong");
+            $("feedback").innerText="Niektoré odpovede sú zlé";
+        }
+
+        updateUI();
+    };
+}
+
+/* ===== OPEN ===== */
+function renderOpenAnswerQuestion(q){
+    $("submit-answer").style.display="inline-block";
+    $("choices").innerHTML=`<input class="open-answer-input" placeholder="Napíš odpoveď">`;
+
+    $("submit-answer").onclick=function(){
+        if(answeredCities.has(currentCity)) return;
+        attempts[currentCity]++;
+
+        const inp=document.querySelector(".open-answer-input");
+        const val=inp.value.trim().toLowerCase();
+        const ok=q.answers.map(a=>a.toLowerCase()).includes(val);
+
+        if(ok){
+            let pts=calcPoints();
+            score+=pts;
+            inp.style.background="#c8e6c9";
+            currentPoint.classList.add("correct");
+            $("feedback").innerText=`Správne! +${pts}`;
+            answeredCities.add(currentCity);
+        }else{
+            inp.style.background="#ffcdd2";
+            currentPoint.classList.add("wrong");
+            $("feedback").innerText="Nesprávne";
+        }
+
+        updateUI();
+    };
+}
+</script>
+</div>
 </body>
 </html>
