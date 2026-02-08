@@ -42,7 +42,7 @@
                 <div class="point" data-city="Zilina" style="top:30%; left:45%;"></div>
                 <div class="point" data-city="BanskaBystrica" style="top:50%; left:52%;"></div>
 
-        
+
 
                 <div id="popup" class="popup">
                     <div class="popup-content">
@@ -56,34 +56,36 @@
                     </div>
                 </div>
             </div>
-        </div>
-<div class="aside">
-    <div id="sidebar">
-            <h3>🏆 Leaderboard</h3>
+            <div class="aside">
+                <div id="sidebar">
+                    <h3>🏆 Leaderboard</h3>
 
-            <div class="player-box">
-                <label for="player-name">Meno hráča</label>
-                <input id="player-name" type="text" placeholder="Zadaj meno" />
-                <button id="save-name-btn" type="button">Uložiť meno</button>
-                <div id="name-status"></div>
+                    <div class="player-box">
+                        <label for="player-name">Meno hráča</label>
+                        <input id="player-name" type="text" placeholder="Zadaj meno" />
+                        <button id="save-name-btn" type="button">Uložiť meno</button>
+                        <div id="name-status"></div>
+                    </div>
+
+                    <ul id="leaderboard"></ul>
+                </div>
+                <div class="text-illustration">
+                    <h3>
+                        ukážka
+                    </h3>
+                    <p class="text"></p>
+                </div>
             </div>
 
-            <ul id="leaderboard"></ul>
-        </div>
-     </div>
-        <div class="text-illustration">
-        <h3>
-            ukážka
-        </h3>
-        <p class="text"></p>
-        </div>
 
+        </div>
     </div>
+
     <div class="footer">
-                    <footer>
-                        <p>made by spsd ke hlavna 113</p>
-                    </footer>
-                </div>
+        <footer>
+            <p>made by spsd ke hlavna 113</p>
+        </footer>
+    </div>
 </body>
 
 <script src="./questions_sets/questions_set_19_8.js"></script>
@@ -111,7 +113,7 @@
     function useQuestionSet(name) {
         if (window[name]) questions = window[name];
         document.querySelectorAll(".text").forEach(p => {
-            p.innerHTML =questions.text;
+            p.innerHTML = questions.text;
         })
     }
 

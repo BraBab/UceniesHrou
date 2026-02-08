@@ -5,6 +5,12 @@ body {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     overflow-x: hidden;
     transition: background 0.5s;
+    padding: 0 var(--page-gutter);
+    box-sizing: border-box;
+}
+
+:root{
+    --page-gutter: 24px;
 }
 
 /* === TITLES === */
@@ -17,28 +23,32 @@ h1 {
 /* === CONTAINERS === */
 .container,
 .footer {
-    margin: 30px auto;
-    max-width: 1200px;
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
     text-align: center;
-    padding: 25px;
+    padding: 0;
 
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.25);
-    box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(6px);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 
-    animation: fadeIn 1s ease;
+    animation: fadeIn 0.6s ease;
 }
 
 p { color: #fff; }
 
 /* === IMAGE === */
+/* make images fill their parent column */
 img {
-    width: 1000px;
+    width: 80%;
+    height: auto;
     display: block;
-    margin: 20px auto;
-    border-radius: 18px;
+    margin: 0;
+    border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     transition: transform 0.3s ease;
 }
@@ -47,11 +57,37 @@ img:hover {
     transform: scale(1.02);
 }
 
+/* === HEADER (full width containers) === */
+header{
+    position: relative;
+    width: 100%;
+    margin: 0 0 20px 0; /* space below header */
+    padding: 18px var(--page-gutter); /* add horizontal gutters */
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.04);
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+    z-index: 5;
+}
+
+/* make footer inside .container span full viewport as well */
+.container > footer {
+    position: relative;
+    width: 100%;
+    margin: 24px 0 0 0; /* space above footer */
+    padding: 14px var(--page-gutter); /* add horizontal gutters */
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.04);
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+}
+
 /* === CONTENT === */
 .content {
     position: relative;
-    width: 1000px;
-    margin: auto;
+    width: 100%;
     animation: fadeIn 1s ease;
 }
 
@@ -79,6 +115,7 @@ img:hover {
     box-shadow: 0 0 8px gold;
     animation: pointPulse 1.5s infinite alternate;
     transition: all 0.3s ease;
+    z-index: 6;
 }
 
 .point.correct {
@@ -96,13 +133,15 @@ img:hover {
 /* === POPUP === */
 .popup {
     display: none;
-    position: fixed;
+    /* cover only the nearest positioned parent (.content) */
+    position: absolute;
     inset: 0;
-    background: rgba(0,0,0,.6);
-    backdrop-filter: blur(6px);
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(4px);
     justify-content: center;
     align-items: center;
     animation: fadeIn 0.3s ease;
+    z-index: 100; /* above points and image */
 }
 
 .popup-content {
@@ -212,26 +251,52 @@ input:focus, select:focus {
 }
 /* === LEADERBOARD/PLAYER === */
 
+#app-layout{
+}
+
 .app-layout{
-  display:flex;
-  gap:16px;
-  align-items:flex-start;
-  padding: 0 16px;
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    padding: 0;
+    justify-content:center;
+    width:100%;
 }
 
 .main-stage{
-  flex:1;
-  min-width:0;
+    /* use full available width */
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 20px var(--page-gutter); /* vertical + horizontal gutters */
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 70% 30%;
+    gap: 20px;
+    align-items: start;
+}
+
+.aside{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
 }
 
 #sidebar{
-  width:320px;
-  flex:0 0 320px;
-  background:#fff;
-  border-radius:12px;
-  box-shadow:0 4px 16px rgba(0,0,0,0.15);
-  padding:12px;
-  height: fit-content;
+    width:100%;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.15);
+    padding:12px;
+    height: fit-content;
+}
+
+.text-illustration{
+    width:100%;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 12px;
+    color: #fff;
 }
 
 #sidebar h3{
@@ -273,4 +338,20 @@ input:focus, select:focus {
 #leaderboard li{
   padding:6px 0;
   border-bottom:1px solid #eee;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+    .main-stage {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+
+    .content { order: 1; }
+    .aside { order: 2; width: 100%; }
+
+    header{
+        padding: 14px 10px;
+        text-align: center;
+    }
 }
