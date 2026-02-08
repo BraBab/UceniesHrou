@@ -65,6 +65,7 @@
                         <input id="player-name" type="text" placeholder="Zadaj meno" />
                         <button id="save-name-btn" type="button">Uložiť meno</button>
                         <div id="name-status"></div>
+                        <div id="session-hint" style="font-size:12px; opacity:.7; margin-top:6px;"></div>
                     </div>
 
                     <ul id="leaderboard"></ul>
@@ -86,9 +87,7 @@
             <p>made by spsd ke hlavna 113</p>
         </footer>
     </div>
-</body>
-
-<script src="./questions_sets/questions_set_19_8.js"></script>
+    <script src="./questions_sets/questions_set_19_8.js"></script>
 <script src="./questions_sets/questions_set_19_7.js"></script>
 
 <script>
@@ -278,106 +277,123 @@
         };
     }
 </script>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-/* SUPABASE + LEADERBOARD SCRIPT */
-<script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        const SUPABASE_URL = "https://yyzvddiorocquktqlpep.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5enZkZGlvcm9jcXVrdHFscGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Njc1NjAsImV4cCI6MjA4NjA0MzU2MH0._Xpv1TDkXCYjA34CPnXzqDOIX84-0KRYpISoqZcid64";
 
-    const SUPABASE_URL = "https://yyzvddiorocquktqlpep.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5enZkZGlvcm9jcXVrdHFscGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Njc1NjAsImV4cCI6MjA4NjA0MzU2MH0._Xpv1TDkXCYjA34CPnXzqDOIX84-0KRYpISoqZcid64";
+        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const nameInput = document.getElementById("player-name");
-    const saveBtn = document.getElementById("save-name-btn");
-    const statusEl = document.getElementById("name-status");
-
-    const savedName = localStorage.getItem("player_name");
-    if (savedName && nameInput) nameInput.value = savedName;
-
-    function setStatus(msg) {
-        if (!statusEl) return;
-        statusEl.textContent = msg || "";
-    }
-
-    function getPlayerName() {
-        return (nameInput?.value || "").trim();
-    }
-
-    function saveName() {
-        const name = getPlayerName();
-        if (!name) {
-            setStatus("Najprv zadaj meno.");
-            return false;
-        }
-        localStorage.setItem("player_name", name);
-        setStatus(`Meno uložené: ${name}`);
-        return true;
-    }
-
-    saveBtn?.addEventListener("click", saveName);
-    nameInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            saveName();
-        }
-    });
-    nameInput?.addEventListener("blur", () => {
-        if (getPlayerName()) saveName();
-    });
-
-    async function loadLeaderboard() {
-        const { data, error } = await sb
-            .from("leaderboard")
-            .select("name, score")
-            .order("score", { ascending: false })
-            .limit(10);
-
-        if (error) {
-            console.error("loadLeaderboard error:", error);
-            setStatus(`Chyba: ${error.message}`);
-            return;
+        // ===================== [ADDED START] SESSION ID (unique per user run) =====================
+        const SESSION_KEY = "leaderboard_session_id";
+        let sessionId = localStorage.getItem(SESSION_KEY);
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem(SESSION_KEY, sessionId);
         }
 
-        const ul = document.getElementById("leaderboard");
-        if (!ul) return;
+        const sessionHintEl = document.getElementById("session-hint");
+        if (sessionHintEl) sessionHintEl.textContent = `session: ${sessionId.slice(0, 8)}…`;
+        // ===================== [ADDED END] SESSION ID (unique per user run) =====================
 
-        ul.innerHTML = "";
-        data.forEach(row => {
-            const li = document.createElement("li");
-            li.textContent = `${row.name} — ${row.score}`;
-            ul.appendChild(li);
+        const nameInput = document.getElementById("player-name");
+        const saveBtn = document.getElementById("save-name-btn");
+        const statusEl = document.getElementById("name-status");
+
+        const savedName = localStorage.getItem("player_name");
+        if (savedName && nameInput) nameInput.value = savedName;
+
+        function setStatus(msg) {
+            if (!statusEl) return;
+            statusEl.textContent = msg || "";
+        }
+
+        function getPlayerName() {
+            return (nameInput?.value || "").trim();
+        }
+
+        function saveName() {
+            const name = getPlayerName();
+            if (!name) {
+                setStatus("Najprv zadaj meno.");
+                return false;
+            }
+            localStorage.setItem("player_name", name);
+            setStatus(`Meno uložené: ${name}`);
+            return true;
+        }
+
+        saveBtn?.addEventListener("click", saveName);
+        nameInput?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                saveName();
+            }
         });
-    }
+        nameInput?.addEventListener("blur", () => {
+            if (getPlayerName()) saveName();
+        });
 
-    let lastWriteAt = 0;
+        async function loadLeaderboard() {
+            const { data, error } = await sb
+                .from("leaderboard")
+                .select("name, score")
+                .order("score", { ascending: false })
+                .limit(10);
 
-    async function upsertScore(delta = 10) {
-        const name = getPlayerName();
-        if (!name) {
-            setStatus("Najprv zadaj meno.");
-            return;
+            if (error) {
+                console.error("loadLeaderboard error:", error);
+                setStatus(`Chyba: ${error.message}`);
+                return;
+            }
+
+            const ul = document.getElementById("leaderboard");
+            if (!ul) return;
+
+            ul.innerHTML = "";
+            data.forEach(row => {
+                const li = document.createElement("li");
+                li.textContent = `${row.name} — ${row.score}`;
+                ul.appendChild(li);
+            });
         }
-        if (!Number.isFinite(delta) || delta <= 0) return;
 
-        const now = Date.now();
-        if (now - lastWriteAt < 250) return;
-        lastWriteAt = now;
+        let lastWriteAt = 0;
 
-        const { error } = await sb.rpc("add_score", { p_name: name, p_delta: delta });
+        async function upsertScore(delta = 10) {
+            const name = getPlayerName();
+            if (!name) {
+                setStatus("Najprv zadaj meno.");
+                return;
+            }
+            if (!Number.isFinite(delta) || delta <= 0) return;
 
-        if (error) {
-            console.error("add_score rpc error:", error);
-            setStatus(`Chyba: ${error.message}`);
-            return;
+            const now = Date.now();
+            if (now - lastWriteAt < 250) return;
+            lastWriteAt = now;
+
+            // ===================== [CHANGED START] RPC -> upsert by session_id, not by name =====================
+            const { error } = await sb.rpc("upsert_score_session", {
+                p_session_id: sessionId,
+                p_name: name,
+                p_delta: delta
+            });
+            // ===================== [CHANGED END] RPC -> upsert by session_id, not by name =====================
+
+            if (error) {
+                console.error("upsert_score_session rpc error:", error);
+                setStatus(`Chyba: ${error.message}`);
+                return;
+            }
+
+            setStatus(`Skóre uložené: +${delta}`);
+            await loadLeaderboard();
         }
 
-        setStatus(`Skóre uložené: +${delta}`);
-        await loadLeaderboard();
-    }
-
-    window.upsertScore = upsertScore;
-    window.addEventListener("load", loadLeaderboard);
-</script>
+        window.upsertScore = upsertScore;
+        window.addEventListener("load", loadLeaderboard);
+    </script>
+</body>
 
 </html>
