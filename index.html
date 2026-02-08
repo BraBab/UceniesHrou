@@ -76,296 +76,295 @@
         </div>
 
     </div>
+</body>
 
-    <script src="./questions_sets/questions_set_19_8.js"></script>
-    <script src="./questions_sets/questions_set_19_7.js"></script>
+<script src="./questions_sets/questions_set_19_8.js"></script>
+<script src="./questions_sets/questions_set_19_7.js"></script>
 
-    <script>
-        let questions = {};
-        let score = 0;
-        let visitedCities = new Set();
-        let answeredCities = new Set();
-        let attempts = {};
-        let currentCity = null;
-        let currentPoint = null;
+<script>
+    let questions = {};
+    let score = 0;
+    let visitedCities = new Set();
+    let answeredCities = new Set();
+    let attempts = {};
+    let currentCity = null;
+    let currentPoint = null;
 
-        const $ = id => document.getElementById(id);
+    const $ = id => document.getElementById(id);
 
-        function updateUI() {
-            $("score").innerText = score;
-            $("visited").innerText = visitedCities.size;
-            $("score").classList.remove("score-anim");
-            void $("score").offsetWidth;
-            $("score").classList.add("score-anim");
-        }
+    function updateUI() {
+        $("score").innerText = score;
+        $("visited").innerText = visitedCities.size;
+        $("score").classList.remove("score-anim");
+        void $("score").offsetWidth;
+        $("score").classList.add("score-anim");
+    }
 
-        function useQuestionSet(name) {
-            if (window[name]) questions = window[name];
-        }
+    function useQuestionSet(name) {
+        if (window[name]) questions = window[name];
+    }
 
-        const selectEl = $("question-set-select");
-        useQuestionSet(selectEl.value);
-        selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
+    const selectEl = $("question-set-select");
+    useQuestionSet(selectEl.value);
+    selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
 
-        document.querySelectorAll(".point").forEach(p => {
-            p.addEventListener("click", () => showTask(p.dataset.city, p));
-        });
+    document.querySelectorAll(".point").forEach(p => {
+        p.addEventListener("click", () => showTask(p.dataset.city, p));
+    });
 
-        function showTask(city, el) {
-            currentCity = city;
-            currentPoint = el;
-            if (!attempts[city]) attempts[city] = 0;
-            visitedCities.add(city);
-            updateUI();
-            renderQuestion(city);
-            $("popup").style.display = "flex";
-        }
+    function showTask(city, el) {
+        currentCity = city;
+        currentPoint = el;
+        if (!attempts[city]) attempts[city] = 0;
+        visitedCities.add(city);
+        updateUI();
+        renderQuestion(city);
+        $("popup").style.display = "flex";
+    }
 
-        function closePopup() {
-            $("popup").style.display = "none";
-            $("choices").innerHTML = "";
-            $("feedback").innerText = "";
-        }
+    function closePopup() {
+        $("popup").style.display = "none";
+        $("choices").innerHTML = "";
+        $("feedback").innerText = "";
+    }
 
-        function renderQuestion(city) {
-            const q = questions[city];
-            if (!q) return;
+    function renderQuestion(city) {
+        const q = questions[city];
+        if (!q) return;
 
-            $("task-title").innerText = "Úloha pre mesto " + city;
-            $("question-text").innerText = q.question;
-            $("choices").innerHTML = "";
-            $("feedback").innerText = "";
+        $("task-title").innerText = "Úloha pre mesto " + city;
+        $("question-text").innerText = q.question;
+        $("choices").innerHTML = "";
+        $("feedback").innerText = "";
 
-            if (q.type === "choice") renderChoiceQuestion(q);
-            if (q.type === "fill") renderFillQuestion(q);
-            if (q.type === "openAnswer") renderOpenAnswerQuestion(q);
-        }
+        if (q.type === "choice") renderChoiceQuestion(q);
+        if (q.type === "fill") renderFillQuestion(q);
+        if (q.type === "openAnswer") renderOpenAnswerQuestion(q);
+    }
 
-        function calcPoints() {
-            if (attempts[currentCity] === 1) return 10;
-            if (attempts[currentCity] === 2) return 5;
-            if (attempts[currentCity] === 3) return 2;
-            return 0;
-        }
+    function calcPoints() {
+        if (attempts[currentCity] === 1) return 10;
+        if (attempts[currentCity] === 2) return 5;
+        if (attempts[currentCity] === 3) return 2;
+        return 0;
+    }
 
-        /* ===== CHOICE ===== */
-        function renderChoiceQuestion(q) {
-            $("submit-answer").style.display = "inline-block";
+    /* ===== CHOICE ===== */
+    function renderChoiceQuestion(q) {
+        $("submit-answer").style.display = "inline-block";
 
-            for (const key in q.choices) {
-                $("choices").innerHTML += `
+        for (const key in q.choices) {
+            $("choices").innerHTML += `
                 <div class="choice">
                   <input type="radio" name="answer" value="${key}">
                   ${key}: ${q.choices[key]}
                 </div>`;
+        }
+
+        $("submit-answer").onclick = function () {
+            if (answeredCities.has(currentCity)) return;
+
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (!selected) return;
+
+            attempts[currentCity]++;
+
+            const chosen = selected.closest(".choice");
+
+            if (selected.value === q.correct) {
+                let pts = calcPoints();
+                score += pts;
+
+                if (pts > 0 && window.upsertScore) window.upsertScore(pts);
+
+                chosen.classList.add("correct");
+                currentPoint.classList.add("correct");
+                $("feedback").innerText = pts ? `Správne! +${pts}` : "Správne! (0 bodov)";
+                answeredCities.add(currentCity);
+            } else {
+                chosen.classList.add("wrong");
+                currentPoint.classList.add("wrong");
+                $("feedback").innerText = "Nesprávne, skús znova";
             }
 
-            $("submit-answer").onclick = function () {
-                if (answeredCities.has(currentCity)) return;
+            updateUI();
+        };
+    }
 
-                const selected = document.querySelector('input[name="answer"]:checked');
-                if (!selected) return;
-
-                attempts[currentCity]++;
-
-                const chosen = selected.closest(".choice");
-
-                if (selected.value === q.correct) {
-                    let pts = calcPoints();
-                    score += pts;
-
-                    if (pts > 0 && window.upsertScore) window.upsertScore(pts);
-
-                    chosen.classList.add("correct");
-                    currentPoint.classList.add("correct");
-                    $("feedback").innerText = pts ? `Správne! +${pts}` : "Správne! (0 bodov)";
-                    answeredCities.add(currentCity);
-                } else {
-                    chosen.classList.add("wrong");
-                    currentPoint.classList.add("wrong");
-                    $("feedback").innerText = "Nesprávne, skús znova";
-                }
-
-                updateUI();
-            };
-        }
-
-        /* ===== FILL ===== */
-        function renderFillQuestion(q) {
-            $("submit-answer").style.display = "inline-block";
-            const parts = q.sentence.split("___");
-            let html = "<p>";
-            parts.forEach((p, i) => {
-                html += p;
-                if (i < q.answers.length) html += `<input class="fill-input">`;
-            });
-            html += "</p>";
-            $("choices").innerHTML = html;
-
-            $("submit-answer").onclick = function () {
-                if (answeredCities.has(currentCity)) return;
-                attempts[currentCity]++;
-                const inputs = document.querySelectorAll(".fill-input");
-                let ok = true;
-                inputs.forEach((inp, i) => {
-                    if (inp.value.trim().toLowerCase() !== q.answers[i].toLowerCase()) {
-                        ok = false; inp.style.background = "#ffcdd2";
-                    } else inp.style.background = "#c8e6c9";
-                });
-
-                if (ok) {
-                    let pts = calcPoints();
-                    score += pts;
-
-                    if (pts > 0 && window.upsertScore) window.upsertScore(pts);
-
-                    currentPoint.classList.add("correct");
-                    $("feedback").innerText = `Správne! +${pts}`;
-                    answeredCities.add(currentCity);
-                } else {
-                    currentPoint.classList.add("wrong");
-                    $("feedback").innerText = "Niektoré odpovede sú zlé";
-                }
-
-                updateUI();
-            };
-        }
-
-        /* ===== OPEN ===== */
-        function renderOpenAnswerQuestion(q) {
-            $("submit-answer").style.display = "inline-block";
-            $("choices").innerHTML = `<input class="open-answer-input" placeholder="Napíš odpoveď">`;
-
-            $("submit-answer").onclick = function () {
-                if (answeredCities.has(currentCity)) return;
-                attempts[currentCity]++;
-
-                const inp = document.querySelector(".open-answer-input");
-                const val = inp.value.trim().toLowerCase();
-                const ok = q.answers.map(a => a.toLowerCase()).includes(val);
-
-                if (ok) {
-                    let pts = calcPoints();
-                    score += pts;
-
-                    if (pts > 0 && window.upsertScore) window.upsertScore(pts);
-
-                    inp.style.background = "#c8e6c9";
-                    currentPoint.classList.add("correct");
-                    $("feedback").innerText = `Správne! +${pts}`;
-                    answeredCities.add(currentCity);
-                } else {
-                    inp.style.background = "#ffcdd2";
-                    currentPoint.classList.add("wrong");
-                    $("feedback").innerText = "Nesprávne";
-                }
-
-                updateUI();
-            };
-        }
-    </script>
-
-    /* SUPABASE + LEADERBOARD SCRIPT */
-    <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-        const SUPABASE_URL = "https://yyzvddiorocquktqlpep.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5enZkZGlvcm9jcXVrdHFscGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Njc1NjAsImV4cCI6MjA4NjA0MzU2MH0._Xpv1TDkXCYjA34CPnXzqDOIX84-0KRYpISoqZcid64";
-
-        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const nameInput = document.getElementById("player-name");
-        const saveBtn = document.getElementById("save-name-btn");
-        const statusEl = document.getElementById("name-status");
-
-        const savedName = localStorage.getItem("player_name");
-        if (savedName && nameInput) nameInput.value = savedName;
-
-        function setStatus(msg) {
-            if (!statusEl) return;
-            statusEl.textContent = msg || "";
-        }
-
-        function getPlayerName() {
-            return (nameInput?.value || "").trim();
-        }
-
-        function saveName() {
-            const name = getPlayerName();
-            if (!name) {
-                setStatus("Najprv zadaj meno.");
-                return false;
-            }
-            localStorage.setItem("player_name", name);
-            setStatus(`Meno uložené: ${name}`);
-            return true;
-        }
-
-        saveBtn?.addEventListener("click", saveName);
-        nameInput?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                saveName();
-            }
+    /* ===== FILL ===== */
+    function renderFillQuestion(q) {
+        $("submit-answer").style.display = "inline-block";
+        const parts = q.sentence.split("___");
+        let html = "<p>";
+        parts.forEach((p, i) => {
+            html += p;
+            if (i < q.answers.length) html += `<input class="fill-input">`;
         });
-        nameInput?.addEventListener("blur", () => {
-            if (getPlayerName()) saveName();
-        });
+        html += "</p>";
+        $("choices").innerHTML = html;
 
-        async function loadLeaderboard() {
-            const { data, error } = await sb
-                .from("leaderboard")
-                .select("name, score")
-                .order("score", { ascending: false })
-                .limit(10);
-
-            if (error) {
-                console.error("loadLeaderboard error:", error);
-                setStatus(`Chyba: ${error.message}`);
-                return;
-            }
-
-            const ul = document.getElementById("leaderboard");
-            if (!ul) return;
-
-            ul.innerHTML = "";
-            data.forEach(row => {
-                const li = document.createElement("li");
-                li.textContent = `${row.name} — ${row.score}`;
-                ul.appendChild(li);
+        $("submit-answer").onclick = function () {
+            if (answeredCities.has(currentCity)) return;
+            attempts[currentCity]++;
+            const inputs = document.querySelectorAll(".fill-input");
+            let ok = true;
+            inputs.forEach((inp, i) => {
+                if (inp.value.trim().toLowerCase() !== q.answers[i].toLowerCase()) {
+                    ok = false; inp.style.background = "#ffcdd2";
+                } else inp.style.background = "#c8e6c9";
             });
-        }
 
-        let lastWriteAt = 0;
+            if (ok) {
+                let pts = calcPoints();
+                score += pts;
 
-        async function upsertScore(delta = 10) {
-            const name = getPlayerName();
-            if (!name) {
-                setStatus("Najprv zadaj meno.");
-                return;
-            }
-            if (!Number.isFinite(delta) || delta <= 0) return;
+                if (pts > 0 && window.upsertScore) window.upsertScore(pts);
 
-            const now = Date.now();
-            if (now - lastWriteAt < 250) return;
-            lastWriteAt = now;
-
-            const { error } = await sb.rpc("add_score", { p_name: name, p_delta: delta });
-
-            if (error) {
-                console.error("add_score rpc error:", error);
-                setStatus(`Chyba: ${error.message}`);
-                return;
+                currentPoint.classList.add("correct");
+                $("feedback").innerText = `Správne! +${pts}`;
+                answeredCities.add(currentCity);
+            } else {
+                currentPoint.classList.add("wrong");
+                $("feedback").innerText = "Niektoré odpovede sú zlé";
             }
 
-            setStatus(`Skóre uložené: +${delta}`);
-            await loadLeaderboard();
+            updateUI();
+        };
+    }
+
+    /* ===== OPEN ===== */
+    function renderOpenAnswerQuestion(q) {
+        $("submit-answer").style.display = "inline-block";
+        $("choices").innerHTML = `<input class="open-answer-input" placeholder="Napíš odpoveď">`;
+
+        $("submit-answer").onclick = function () {
+            if (answeredCities.has(currentCity)) return;
+            attempts[currentCity]++;
+
+            const inp = document.querySelector(".open-answer-input");
+            const val = inp.value.trim().toLowerCase();
+            const ok = q.answers.map(a => a.toLowerCase()).includes(val);
+
+            if (ok) {
+                let pts = calcPoints();
+                score += pts;
+
+                if (pts > 0 && window.upsertScore) window.upsertScore(pts);
+
+                inp.style.background = "#c8e6c9";
+                currentPoint.classList.add("correct");
+                $("feedback").innerText = `Správne! +${pts}`;
+                answeredCities.add(currentCity);
+            } else {
+                inp.style.background = "#ffcdd2";
+                currentPoint.classList.add("wrong");
+                $("feedback").innerText = "Nesprávne";
+            }
+
+            updateUI();
+        };
+    }
+</script>
+
+/* SUPABASE + LEADERBOARD SCRIPT */
+<script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const SUPABASE_URL = "https://yyzvddiorocquktqlpep.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5enZkZGlvcm9jcXVrdHFscGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Njc1NjAsImV4cCI6MjA4NjA0MzU2MH0._Xpv1TDkXCYjA34CPnXzqDOIX84-0KRYpISoqZcid64";
+
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const nameInput = document.getElementById("player-name");
+    const saveBtn = document.getElementById("save-name-btn");
+    const statusEl = document.getElementById("name-status");
+
+    const savedName = localStorage.getItem("player_name");
+    if (savedName && nameInput) nameInput.value = savedName;
+
+    function setStatus(msg) {
+        if (!statusEl) return;
+        statusEl.textContent = msg || "";
+    }
+
+    function getPlayerName() {
+        return (nameInput?.value || "").trim();
+    }
+
+    function saveName() {
+        const name = getPlayerName();
+        if (!name) {
+            setStatus("Najprv zadaj meno.");
+            return false;
+        }
+        localStorage.setItem("player_name", name);
+        setStatus(`Meno uložené: ${name}`);
+        return true;
+    }
+
+    saveBtn?.addEventListener("click", saveName);
+    nameInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            saveName();
+        }
+    });
+    nameInput?.addEventListener("blur", () => {
+        if (getPlayerName()) saveName();
+    });
+
+    async function loadLeaderboard() {
+        const { data, error } = await sb
+            .from("leaderboard")
+            .select("name, score")
+            .order("score", { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error("loadLeaderboard error:", error);
+            setStatus(`Chyba: ${error.message}`);
+            return;
         }
 
-        window.upsertScore = upsertScore;
-        window.addEventListener("load", loadLeaderboard);
-    </script>
+        const ul = document.getElementById("leaderboard");
+        if (!ul) return;
 
-</body>
+        ul.innerHTML = "";
+        data.forEach(row => {
+            const li = document.createElement("li");
+            li.textContent = `${row.name} — ${row.score}`;
+            ul.appendChild(li);
+        });
+    }
+
+    let lastWriteAt = 0;
+
+    async function upsertScore(delta = 10) {
+        const name = getPlayerName();
+        if (!name) {
+            setStatus("Najprv zadaj meno.");
+            return;
+        }
+        if (!Number.isFinite(delta) || delta <= 0) return;
+
+        const now = Date.now();
+        if (now - lastWriteAt < 250) return;
+        lastWriteAt = now;
+
+        const { error } = await sb.rpc("add_score", { p_name: name, p_delta: delta });
+
+        if (error) {
+            console.error("add_score rpc error:", error);
+            setStatus(`Chyba: ${error.message}`);
+            return;
+        }
+
+        setStatus(`Skóre uložené: +${delta}`);
+        await loadLeaderboard();
+    }
+
+    window.upsertScore = upsertScore;
+    window.addEventListener("load", loadLeaderboard);
+</script>
 
 </html>
