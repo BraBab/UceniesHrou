@@ -1,6 +1,7 @@
 window.questions_set_19_8 = {
     "text": "Aj vy/Vy máte počas leta často chuť na sýtené nápoje? Zatiaľ čo sladené malinovky z obchodu obsahujú veľké množstvo cukru, všelijakých/všeliakých farbív a konzervantov, na pohári čistej perlivej vody ochutenej napríklad kúskami ovocia či byliniek nie je nič zlé. S prístrojmi SodaStreamSPIRIT to s prehľadom zvládnete v pohodlí domova, a rovnako tak aj najmladší či, naopak, najstarší členovia rodiny. Stačí naplniť fľašu, zakliknúť do prístroja a stlačením tlačítka/tlačidla nasýtiť podľa vlastných predstáv. Bombička s obsahom CO2 vystačí na prípravu až 70 litrov perlivej vody, čo zodpovedá približne 47 fľašiam s objemom 1,5 litra. Prístroj SodaStreamSPIRIT je dostupný v troch farbách – bielej, čiernej a červenej. V prípade, že s prístrojom nebudete spokojní, do 60 dní od zakúpenia vám vrátia peniaze.",
-    "Kosice": {
+    "Kosice": [
+    {
         type: "choice",
         requireText: true,
         question: "Ukážka 8 predstavuje",
@@ -12,6 +13,62 @@ window.questions_set_19_8 = {
         },
         correct: "C"
     },
+    {
+        type: "choice",
+        question: "A?",
+        choices: {
+            A: "A",
+            B: "B",
+            C: "C",
+            D: "D"
+        },
+        correct: "A"
+    },
+    {
+        type: "choice",
+        question: "B?",
+        choices: {
+            A: "A",
+            B: "B",
+            C: "C",
+            D: "D"
+        },
+        correct: "B"
+    },
+    {
+        type: "choice",
+        question: "E?",
+        choices: {
+            A: "A",
+            B: "B",
+            C: "C",
+            D: "D"
+        },
+        correct: "B"
+    },
+    {
+        type: "choice",
+        question: "C?",
+        choices: {
+            A: "A",
+            B: "B",
+            C: "C",
+            D: "D"
+        },
+        correct: "B"
+    },
+    {
+        type: "choice",
+        question: "D?",
+        choices: {
+            A: "A",
+            B: "B",
+            C: "C",
+            D: "D"
+        },
+        correct: "B"
+    }
+    ],
     "Presov": {
         type: "choice",
         question: "V ktorej možnosti sa nachádza združené pomenovanie?",

@@ -41,20 +41,41 @@ h1 {
 
 p { color: #fff; }
 
-/* === IMAGE === */
-/* make images fill their parent column */
-img {
-    width: 80%;
-    height: auto;
-    display: block;
-    margin: 0;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease;
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
 }
 
-img:hover {
-    transform: scale(1.02);
+.map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.point {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: gold;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 8px gold;
+    animation: pointPulse 1.5s infinite alternate;
+    transition: all 0.3s ease;
+    z-index: 6;
+}
+
+.point.correct {
+    background: #4caf50;
+    box-shadow: 0 0 15px #4caf50;
+    animation: pulseCorrect 1s infinite alternate;
+}
+
+.point.wrong {
+    background: #f44336;
+    box-shadow: 0 0 15px #f44336;
+    animation: pulseWrong 1s infinite alternate;
 }
 
 /* === HEADER (full width containers) === */
@@ -105,10 +126,22 @@ header{
 }
 
 /* === POINTS === */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+}
+
+.map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .point {
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
     background: gold;
     cursor: pointer;
     border-radius: 50%;
@@ -354,4 +387,18 @@ input:focus, select:focus {
         padding: 14px 10px;
         text-align: center;
     }
+}
+.point.no-question {
+    background: #1e88e5;
+    box-shadow: 0 0 10px rgba(30,136,229,.75);
+    opacity: 0.95;
+}
+
+.point.no-question {
+    animation: pointPulseBlue 1.5s infinite alternate;
+}
+
+@keyframes pointPulseBlue {
+    0% { transform: scale(0.5); box-shadow: 0 0 3px rgba(30,136,229,.6); }
+    100% { transform: scale(0.8); box-shadow: 0 0 10px rgba(30,136,229,.9); }
 }
