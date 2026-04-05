@@ -20,6 +20,18 @@ h1 {
     animation: titlePop 0.8s ease;
 }
 
+/* === LABEL (ТВОЙ ТЕКСТ СЛЕВА) === */
+label {
+    color: white;
+}
+
+/* === SELECT (ВЫПАДАЮЩИЙ СПИСОК) === */
+select {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+}
+
 /* === CONTAINERS === */
 .container,
 .footer {
@@ -78,31 +90,16 @@ p { color: #fff; }
     animation: pulseWrong 1s infinite alternate;
 }
 
-/* === HEADER (full width containers) === */
+/* === HEADER === */
 header{
     position: relative;
     width: 100%;
-    margin: 0 0 20px 0; /* space below header */
-    padding: 18px var(--page-gutter); /* add horizontal gutters */
+    margin: 0 0 20px 0;
+    padding: 18px var(--page-gutter);
     box-sizing: border-box;
     background: rgba(255,255,255,0.04);
-    border-radius: 0;
-    box-shadow: none;
     text-align: center;
     z-index: 5;
-}
-
-/* make footer inside .container span full viewport as well */
-.container > footer {
-    position: relative;
-    width: 100%;
-    margin: 24px 0 0 0; /* space above footer */
-    padding: 14px var(--page-gutter); /* add horizontal gutters */
-    box-sizing: border-box;
-    background: rgba(255,255,255,0.04);
-    border-radius: 0;
-    box-shadow: none;
-    text-align: center;
 }
 
 /* === CONTENT === */
@@ -122,59 +119,18 @@ header{
     border-radius: 12px;
     color: white;
     font-weight: bold;
-    animation: fadeIn 1s ease;
-}
-
-/* === POINTS === */
-.map-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-}
-
-.map-image {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.point {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: gold;
-    cursor: pointer;
-    border-radius: 50%;
-    box-shadow: 0 0 8px gold;
-    animation: pointPulse 1.5s infinite alternate;
-    transition: all 0.3s ease;
-    z-index: 6;
-}
-
-.point.correct {
-    background: #4caf50;
-    box-shadow: 0 0 15px #4caf50;
-    animation: pulseCorrect 1s infinite alternate;
-}
-
-.point.wrong {
-    background: #f44336;
-    box-shadow: 0 0 15px #f44336;
-    animation: pulseWrong 1s infinite alternate;
 }
 
 /* === POPUP === */
 .popup {
     display: none;
-    /* cover only the nearest positioned parent (.content) */
     position: absolute;
     inset: 0;
     background: rgba(0,0,0,.55);
     backdrop-filter: blur(4px);
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.3s ease;
-    z-index: 100; /* above points and image */
+    z-index: 100;
 }
 
 .popup-content {
@@ -183,19 +139,12 @@ header{
     padding: 25px;
     border-radius: 18px;
     color: white;
-    min-width: 300px;
-    animation: popupScale 0.3s ease;
 }
 
 .close {
     cursor: pointer;
     float: right;
     font-size: 26px;
-    transition: color 0.2s ease;
-}
-
-.close:hover {
-    color: #ff5252;
 }
 
 #submit-answer {
@@ -206,39 +155,15 @@ header{
     color: white;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-#submit-answer:hover {
-    transform: scale(1.05);
-    background: rgba(255,255,255,.45);
-}
-
-/* === CHOICES === */
-.choice.correct { 
-    color: #4caf50; 
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.choice.wrong { 
-    color: #f44336; 
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-input, select {
+/* === INPUT (оставляем белый текст ТОЛЬКО для input) === */
+input {
     background: rgba(255,255,255,.2);
     border: 1px solid rgba(255,255,255,.3);
     color: white;
     border-radius: 6px;
     padding: 4px 8px;
-    transition: all 0.2s ease;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: #ffd54f;
 }
 
 /* === ANIMATIONS === */
@@ -247,30 +172,9 @@ input:focus, select:focus {
     to {opacity:1;}
 }
 
-@keyframes popupScale {
-    from {transform: scale(0.7); opacity:0;}
-    to {transform: scale(1); opacity:1;}
-}
-
-@keyframes scorePop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
 @keyframes pointPulse {
-    0% { transform: scale(0.5); box-shadow: 0 0 3px gold; }
-    100% { transform: scale(0.8); box-shadow: 0 0 3px gold; }
-}
-
-@keyframes pulseCorrect {
-    0% { transform: scale(1); box-shadow: 0 0 8px #4caf50; }
-    100% { transform: scale(1.3); box-shadow: 0 0 18px #4caf50; }
-}
-
-@keyframes pulseWrong {
-    0% { transform: scale(1); box-shadow: 0 0 8px #f44336; }
-    100% { transform: scale(1.3); box-shadow: 0 0 18px #f44336; }
+    0% { transform: scale(0.5); }
+    100% { transform: scale(0.8); }
 }
 
 @keyframes titlePop {
@@ -278,127 +182,31 @@ input:focus, select:focus {
     100% { transform: scale(1); opacity:1;}
 }
 
-/* === SCORE ANIMATION === */
-.score-anim {
-    animation: scorePop 0.3s ease;
-}
-/* === LEADERBOARD/PLAYER === */
-
-#app-layout{
-}
-
+/* === LAYOUT === */
 .app-layout{
     display:flex;
     gap:16px;
-    align-items:flex-start;
-    padding: 0;
     justify-content:center;
     width:100%;
 }
 
 .main-stage{
-    /* use full available width */
-    max-width: none;
     width: 100%;
-    margin: 0;
-    padding: 20px var(--page-gutter); /* vertical + horizontal gutters */
-    box-sizing: border-box;
+    padding: 20px var(--page-gutter);
     display: grid;
     grid-template-columns: 70% 30%;
     gap: 20px;
-    align-items: start;
-}
-
-.aside{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
 }
 
 #sidebar{
-    width:100%;
     background:#fff;
     border-radius:12px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.15);
     padding:12px;
-    height: fit-content;
-}
-
-.text-illustration{
-    width:100%;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    padding: 12px;
-    color: #fff;
-}
-
-#sidebar h3{
-  margin-top:0;
-  text-align:center;
-}
-
-.player-box input{
-  width:100%;
-  box-sizing:border-box;
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #cfcfcf;
-  background:#fff;
-  color:#111;
-}
-
-#save-name-btn{
-  margin-top:8px;
-  width:100%;
-  padding:8px 10px;
-  border:0;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-#name-status{
-  margin-top:6px;
-  font-size:12px;
-  color:#333;
-}
-
-#leaderboard{
-  list-style:none;
-  padding:0;
-  margin:12px 0 0 0;
-}
-
-#leaderboard li{
-  padding:6px 0;
-  border-bottom:1px solid #eee;
 }
 
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
     .main-stage {
         grid-template-columns: 1fr;
-        padding: 0 10px;
     }
-
-    .content { order: 1; }
-    .aside { order: 2; width: 100%; }
-
-    header{
-        padding: 14px 10px;
-        text-align: center;
-    }
-}
-.point.no-question {
-    background: #1e88e5;
-    box-shadow: 0 0 10px rgba(30,136,229,.75);
-    opacity: 0.95;
-}
-
-.point.no-question {
-    animation: pointPulseBlue 1.5s infinite alternate;
-}
-
-@keyframes pointPulseBlue {
-    0% { transform: scale(0.5); box-shadow: 0 0 3px rgba(30,136,229,.6); }
-    100% { transform: scale(0.8); box-shadow: 0 0 10px rgba(30,136,229,.9); }
 }
