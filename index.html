@@ -35,13 +35,13 @@
                     <img src="./assets/image.png" class="map-image">
 
                     <!-- BRATISLAVA REGION -->
-                    <div class="point" data-city="Bratislava" style="top:67%; left:9.11%;"></div>
+                    <div class="point capital" data-city="Bratislava" style="top:67%; left:9.11%;"></div>
                     <div class="point" data-city="Pezinok" style="top:63.33%; left:11.44%;"></div>
                     <div class="point" data-city="Malacky" style="top:57.78%; left:9.11%;"></div>
                     <div class="point" data-city="DunajskaStreda" style="top:76.30%; left:15.78%;"></div>
 
                     <!-- TRNAVA REGION -->
-                    <div class="point" data-city="Trnava" style="top:60.70%; left:15.89%;"></div>
+                    <div class="point capital" data-city="Trnava" style="top:60.70%; left:15.89%;"></div>
                     <div class="point" data-city="Hlohovec" style="top:57.00%; left:19.22%;"></div>
                     <div class="point" data-city="Piestany" style="top:50.52%; left:18.11%;"></div>
                     <div class="point" data-city="Sered" style="top:65.33%; left:18.67%;"></div>
@@ -50,7 +50,7 @@
                     <div class="point" data-city="Kuty" style="top:44.96%; left:10.89%;"></div>
 
                     <!-- TRENCIN REGION -->
-                    <div class="point" data-city="Trencin" style="top:42.33%; left:21.5%;"></div>
+                    <div class="point capital" data-city="Trencin" style="top:42.33%; left:21.5%;"></div>
                     <div class="point" data-city="NoveMestoNadVahom" style="top:46.89%; left:21.89%;"></div>
                     <div class="point" data-city="Puchov" style="top:34.85%; left:26.33%;"></div>
                     <div class="point" data-city="DubnicaNadVahom" style="top:38.56%; left:24.67%;"></div>
@@ -59,7 +59,7 @@
                     <div class="point" data-city="Topolcany" style="top:54.30%; left:26.89%;"></div>
 
                     <!-- NITRA REGION -->
-                    <div class="point" data-city="Nitra" style="top:62.56%; left:27.44%;"></div>
+                    <div class="point capital" data-city="Nitra" style="top:62.56%; left:27.44%;"></div>
                     <div class="point" data-city="NoveZamky" style="top:78.44%; left:30.78%;"></div>
                     <div class="point" data-city="Levice" style="top:70.11%; left:35.22%;"></div>
                     <div class="point" data-city="Sala" style="top:71.04%; left:23.56%;"></div>
@@ -69,7 +69,7 @@
                     <div class="point" data-city="ZlateMoravce" style="top:61.70%; left:31.89%;"></div>
 
                     <!-- ZILINA REGION -->
-                    <div class="point" data-city="Zilina" style="top:32.07%; left:33.00%;"></div>
+                    <div class="point capital" data-city="Zilina" style="top:32.07%; left:33.00%;"></div>
                     <div class="point" data-city="Cadca" style="top:23.74%; left:31.33%;"></div>
                     <div class="point" data-city="KysuckeNoveMesto" style="top:27.44%; left:30.22%;"></div>
                     <div class="point" data-city="Martin" style="top:36.70%; left:39.11%;"></div>
@@ -81,7 +81,7 @@
                     <div class="point" data-city="Bytca" style="top:33.93%; left:30.78%;"></div>
 
                     <!-- BANSKA BYSTRICA REGION -->
-                    <div class="point" data-city="BanskaBystrica" style="top:50.59%; left:45.22%;"></div>
+                    <div class="point capital" data-city="BanskaBystrica" style="top:50.59%; left:45.22%;"></div>
                     <div class="point" data-city="Brezno" style="top:49.67%; left:53.00%;"></div>
                     <div class="point" data-city="Zvolen" style="top:55.22%; left:43.00%;"></div>
                     <div class="point" data-city="Detva" style="top:58.00%; left:46.89%;"></div>
@@ -95,7 +95,7 @@
                     <div class="point" data-city="Tisovec" style="top:54.30%; left:56.33%;"></div>
 
                     <!-- PRESOV REGION -->
-                    <div class="point" data-city="Presov" style="top:33.00%; left:78.00%;"></div>
+                    <div class="point capital" data-city="Presov" style="top:33.00%; left:78.00%;"></div>
                     <div class="point" data-city="Bardejov" style="top:22.81%; left:82.44%;"></div>
                     <div class="point" data-city="Svidnik" style="top:25.59%; left:85.78%;"></div>
                     <div class="point" data-city="Medzilaborce" style="top:22.81%; left:90.22%;"></div>
@@ -113,7 +113,7 @@
                     <div class="point" data-city="HanusovceNadToplou" style="top:37.63%; left:81.33%;"></div>
 
                     <!-- KOSICE REGION -->
-                    <div class="point" data-city="Kosice" style="top:52.44%; left:81.33%;"></div>
+                    <div class="point capital" data-city="Kosice" style="top:52.44%; left:81.33%;"></div>
                     <div class="point" data-city="SpiskaNovaVes" style="top:47.81%; left:69.67%;"></div>
                     <div class="point" data-city="Roznava" style="top:57.07%; left:68.56%;"></div>
                     <div class="point" data-city="Medzev" style="top:58.93%; left:78.00%;"></div>
@@ -142,7 +142,7 @@
             </div>
             <div class="aside">
     <div class="text-illustration">
-        <h3>ukážka</h3>
+        <h3 style="color: white;">ukážka</h3>
         <p class="text"></p>
     </div>
 
@@ -181,6 +181,7 @@
     let attempts = {};
     let currentCity = null;
     let currentPoint = null;
+    let cityQuestion = {}; // stores the chosen question per city
     
 
     const $ = id => document.getElementById(id); 
@@ -252,6 +253,7 @@
 
     function useQuestionSet(name) {
         if (window[name]) questions = window[name];
+        cityQuestion = {}; // reset stored questions when set changes
         document.querySelectorAll(".text").forEach(p => {
             p.innerHTML = questions.text;
         });
@@ -286,14 +288,19 @@
         const cityQuestions = questions[city];
         if (!cityQuestions) return;
 
-        const q = Array.isArray(cityQuestions)
-            ? cityQuestions[Math.floor(Math.random() * cityQuestions.length)]
-            : cityQuestions;
+        // Pick question once per city, reuse on reopen
+        if (!cityQuestion[city]) {
+            cityQuestion[city] = Array.isArray(cityQuestions)
+                ? cityQuestions[Math.floor(Math.random() * cityQuestions.length)]
+                : cityQuestions;
+        }
+        const q = cityQuestion[city];
 
         $("task-title").innerText = "Úloha pre mesto " + city;
         $("question-text").innerText = q.question;
         $("choices").innerHTML = "";
         $("feedback").innerText = "";
+        $("submit-answer").onclick = null;
 
         if (q.type === "choice") renderChoiceQuestion(q);
         if (q.type === "fill") renderFillQuestion(q);
@@ -336,11 +343,13 @@
                 if (pts > 0 && window.upsertScore) window.upsertScore(pts);
 
                 chosen.classList.add("correct");
+                currentPoint.classList.remove("wrong");
                 currentPoint.classList.add("correct");
                 $("feedback").innerText = pts ? `Správne! +${pts}` : "Správne! (0 bodov)";
                 answeredCities.add(currentCity);
             } else {
                 chosen.classList.add("wrong");
+                currentPoint.classList.remove("correct");
                 currentPoint.classList.add("wrong");
                 $("feedback").innerText = "Nesprávne, skús znova";
             }
@@ -414,10 +423,12 @@
 
             if (pts > 0 && window.upsertScore) window.upsertScore(pts);
 
+            currentPoint.classList.remove("wrong");
             currentPoint.classList.add("correct");
             $("feedback").innerText = `Správne (${percent}%)! +${pts}`;
             answeredCities.add(currentCity);
         } else {
+            currentPoint.classList.remove("correct");
             currentPoint.classList.add("wrong");
             $("feedback").innerText = "Niektoré odpovede sú zlé";
         }
@@ -446,11 +457,13 @@
                 if (pts > 0 && window.upsertScore) window.upsertScore(pts);
 
                 inp.style.background = "#c8e6c9";
+                currentPoint.classList.remove("wrong");
                 currentPoint.classList.add("correct");
                 $("feedback").innerText = `Správne! +${pts}`;
                 answeredCities.add(currentCity);
             } else {
                 inp.style.background = "#ffcdd2";
+                currentPoint.classList.remove("correct");
                 currentPoint.classList.add("wrong");
                 $("feedback").innerText = "Nesprávne";
             }

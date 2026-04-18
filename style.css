@@ -78,16 +78,43 @@ p { color: #fff; }
     z-index: 6;
 }
 
+/* Capitals (krajské mestá) — larger, cyan/white color */
+.point.capital {
+    width: 12px;
+    height: 12px;
+    background: #00e5ff;
+    box-shadow: 0 0 12px #00e5ff, 0 0 4px #fff;
+    border: 2px solid #fff;
+    animation: capitalPulse 1.5s infinite alternate;
+}
+
 .point.correct {
-    background: #4caf50;
-    box-shadow: 0 0 15px #4caf50;
+    background: #4caf50 !important;
+    box-shadow: 0 0 15px #4caf50 !important;
+    border-color: #4caf50 !important;
     animation: pulseCorrect 1s infinite alternate;
 }
 
 .point.wrong {
-    background: #f44336;
-    box-shadow: 0 0 15px #f44336;
+    background: #f44336 !important;
+    box-shadow: 0 0 15px #f44336 !important;
+    border-color: #f44336 !important;
     animation: pulseWrong 1s infinite alternate;
+}
+
+@keyframes capitalPulse {
+    0% { transform: scale(0.85); }
+    100% { transform: scale(1.1); }
+}
+
+@keyframes pulseCorrect {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1.15); }
+}
+
+@keyframes pulseWrong {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1.1); }
 }
 
 /* === HEADER === */
