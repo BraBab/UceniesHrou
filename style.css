@@ -237,3 +237,41 @@ input {
         grid-template-columns: 1fr;
     }
 }
+.legend {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.legend h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Цвета */
+.legend-color.blue {
+    background: #2196f3;
+}
+
+.legend-color.green {
+    background: #4caf50;
+}
+
+.legend-color.red {
+    background: #f44336;
+}
