@@ -197,7 +197,9 @@
     let attempts = {};
     let currentCity = null;
     let currentPoint = null;
-    let cityQuestion = {}; // stores the chosen question per city
+    let cityQuestion = {}; 
+    let usedQuestions = new Set();
+    let allQuestionsPool = [];// stores the chosen question per city
     
 
     const $ = id => document.getElementById(id); 
@@ -268,13 +270,37 @@
     }
 
     function useQuestionSet(name) {
-        if (window[name]) questions = window[name];
-        cityQuestion = {}; // reset stored questions when set changes
-        document.querySelectorAll(".text").forEach(p => {
-            p.innerHTML = questions.text;
-        });
-        markPointsWithoutQuestions();
+    if (window[name]) questions = window[name];
+
+    cityQuestion = {};
+    usedQuestions = new Set();
+    allQuestionsPool = [];
+
+    let idCounter = 0;
+
+    // 👉 собираем ВСЕ вопросы в один массив
+    for (const city in questions) {
+        const qData = questions[city];
+
+        if (Array.isArray(qData)) {
+            qData.forEach(q => {
+                q._id = "q_" + (idCounter++);
+                q._city = city; // запомним город
+                allQuestionsPool.push(q);
+            });
+        } else if (typeof qData === "object") {
+            qData._id = "q_" + (idCounter++);
+            qData._city = city;
+            allQuestionsPool.push(qData);
+        }
     }
+
+    document.querySelectorAll(".text").forEach(p => {
+        p.innerHTML = questions.text;
+    });
+
+    markPointsWithoutQuestions();
+}
 
     const selectEl = $("question-set-select");
     useQuestionSet(selectEl.value);
@@ -306,10 +332,20 @@
 
         // Pick question once per city, reuse on reopen
         if (!cityQuestion[city]) {
-            cityQuestion[city] = Array.isArray(cityQuestions)
-                ? cityQuestions[Math.floor(Math.random() * cityQuestions.length)]
-                : cityQuestions;
-        }
+
+    // фильтр неиспользованных
+    let available = allQuestionsPool.filter(q => !usedQuestions.has(q._id));
+
+    if (available.length === 0) {
+        $("question-text").innerText = "Už nie sú ďalšie otázky 😅";
+        return;
+    }
+
+    const randomQ = available[Math.floor(Math.random() * available.length)];
+
+    cityQuestion[city] = randomQ;
+    usedQuestions.add(randomQ._id);
+}
         const q = cityQuestion[city];
 
         $("task-title").innerText = "Úloha pre mesto " + city;
