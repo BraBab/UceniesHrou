@@ -190,27 +190,27 @@
 <script src="./questions_sets/questions_set_19_7.js"></script>
 
 <script>
-    let questions = {};
-    let score = 0;
-    let visitedCities = new Set();
-    let answeredCities = new Set();
-    let attempts = {};
-    let currentCity = null;
-    let currentPoint = null;
-    let cityQuestion = {}; 
-    let usedQuestions = new Set();
-    let allQuestionsPool = [];// stores the chosen question per city
+    var questions = {};
+    var score = 0;
+    var visitedCities = new Set();
+    var answeredCities = new Set();
+    var attempts = {};
+    var currentCity = null;
+    var currentPoint = null;
+    var cityQuestion = {}; 
+    var usedQuestions = new Set();
+    var allQuestionsPool = [];// stores the chosen question per city
     
 
     const $ = id => document.getElementById(id); 
 
-    function markPointsWithoutQuestions() {
+    window.markPointsWithoutQuestions = function() {
         document.querySelectorAll(".point").forEach(p => {
             const city = p.dataset.city;
             const hasQuestion = !!(questions && questions[city]);
             p.classList.toggle("no-question", !hasQuestion);
         });
-        }
+    };
     function normalizeText(s) {
             return String(s || "")
                 .trim()
@@ -304,7 +304,8 @@
 
     const selectEl = $("question-set-select");
     useQuestionSet(selectEl.value);
-    selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
+    window.localChangeHandler = e =>useQuestionSet(e.target.value);
+    selectEl.addEventListener("change", window.localChangeHandler);
 
     document.querySelectorAll(".point").forEach(p => {
         p.addEventListener("click", () => showTask(p.dataset.city, p));
@@ -532,17 +533,15 @@
 
         const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ===================== [ADDED START] SESSION ID (unique per user run) =====================
         const SESSION_KEY = "leaderboard_session_id";
-        let sessionId = localStorage.getItem(SESSION_KEY);
+        let sessionId = sessionStorage.getItem(SESSION_KEY);
         if (!sessionId) {
             sessionId = crypto.randomUUID();
-            localStorage.setItem(SESSION_KEY, sessionId);
+            sessionStorage.setItem(SESSION_KEY, sessionId);
         }
 
         const sessionHintEl = document.getElementById("session-hint");
         if (sessionHintEl) sessionHintEl.textContent = `session: ${sessionId.slice(0, 8)}…`;
-        // ===================== [ADDED END] SESSION ID (unique per user run) =====================
 
         const nameInput = document.getElementById("player-name");
         const saveBtn = document.getElementById("save-name-btn");
@@ -639,7 +638,81 @@
         }
 
         window.upsertScore = upsertScore;
-        window.addEventListener("load", loadLeaderboard);
+        async function fetchExams() {
+            const { data, error } = await sb.from("exams").select("id, title, year").order("year", { ascending: false });
+            if (data && data.length > 0) {
+                const sel = document.getElementById("question-set-select");
+                sel.innerHTML = "";
+                data.forEach(exam => {
+                    const opt = document.createElement("option");
+                    opt.value = exam.id;
+                    opt.textContent = `${exam.year} - ${exam.title}`;
+                    sel.appendChild(opt);
+                });
+
+                if (window.localChangeHandler) {
+                    sel.removeEventListener("change", window.localChangeHandler);
+                }
+
+                sel.addEventListener("change", async (e) => {
+                    await loadQuestionsFromSupabase(e.target.value);
+                });
+
+                await loadQuestionsFromSupabase(data[0].id);
+            }
+        }
+
+        async function loadQuestionsFromSupabase(examId) {
+            console.log("Loading questions for exam:", examId);
+            const { data: snippets } = await sb.from("snippets").select("id, content").eq("exam_id", examId).limit(1);
+            if (!snippets || snippets.length === 0) return;
+
+            const snippetId = snippets[0].id;
+            const textContent = snippets[0].content;
+
+            const { data: qData } = await sb.from("questions").select("*").eq("snippet_id", snippetId);
+
+            if (qData) {
+                let newQuestions = { text: textContent };
+                qData.forEach(row => {
+                    const qObj = {
+                        type: row.question_type,
+                        question: row.question_text,
+                        sentence: row.context_sentence,
+                        choices: row.options
+                    };
+                    if (qObj.type === "choice") {
+                        qObj.correct = Array.isArray(row.correct_answers) ? row.correct_answers[0] : row.correct_answers;
+                    } else if (qObj.type === "openAnswer" || qObj.type === "fill") {
+                        qObj.answers = row.correct_answers;
+                    }
+
+                    if (newQuestions[row.city_key]) {
+                        if (Array.isArray(newQuestions[row.city_key])) {
+                            newQuestions[row.city_key].push(qObj);
+                        } else {
+                            newQuestions[row.city_key] = [newQuestions[row.city_key], qObj];
+                        }
+                    } else {
+                        newQuestions[row.city_key] = qObj;
+                    }
+                });
+
+                window.questions = newQuestions;
+                window.cityQuestion = {};
+                document.querySelectorAll(".text").forEach(p => {
+                    p.innerHTML = newQuestions.text || "";
+                });
+                if (window.markPointsWithoutQuestions) {
+                    window.markPointsWithoutQuestions();
+                }
+            }
+        }
+
+        window.addEventListener("load", async () => {
+            await loadLeaderboard();
+            await fetchExams();
+        });
     </script>
 </body>
 
