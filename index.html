@@ -11,16 +11,74 @@
 <body>
     <div class="container">
         <header>
-            <h1>Ucenia sa hrou</h1>
+            <h1>🎓 Ucenia sa hrou</h1>
+            <div class="header-actions">
+                <button id="rules-btn" class="btn" type="button" title="Pravidlá hry">
+                    <span>📖</span><span>Pravidlá</span>
+                </button>
+                <button id="theme-toggle" class="btn btn-ghost btn-icon" type="button" title="Prepnúť tému">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
         </header>
+    </div>
+
+    <!-- RULES MODAL -->
+    <div id="rules-popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closeRules()">&times;</span>
+            <h2>📖 Pravidlá hry</h2>
+            <p>Vitaj v hre <strong>Ucenia sa hrou</strong> – interaktívna mapa Slovenska na precvičovanie poznatkov!</p>
+
+            <h3>🗺️ Mapa a body</h3>
+            <ul>
+                <li><span class="legend-dot city" style="display:inline-block;vertical-align:middle"></span> <strong>Žlté body</strong> – bežné mestá</li>
+                <li><span class="legend-dot capital" style="display:inline-block;vertical-align:middle"></span> <strong>Modré body</strong> – <em>krajské mestá</em> (väčšie, s bielym okrajom)</li>
+                <li><span class="legend-dot correct" style="display:inline-block;vertical-align:middle"></span> <strong>Zelený bod</strong> – správna odpoveď</li>
+                <li><span class="legend-dot wrong" style="display:inline-block;vertical-align:middle"></span> <strong>Červený bod</strong> – nesprávna odpoveď</li>
+            </ul>
+
+            <h3>🎯 Ako hrať</h3>
+            <ul>
+                <li>Klikni na bod mesta na mape – otvorí sa úloha.</li>
+                <li>Odpovedz na otázku (výber, doplnenie alebo otvorená odpoveď).</li>
+                <li>Pri nesprávnej odpovedi <strong>môžeš skúšať znova</strong> – bod sa zafarbí na červeno, kým neodpovieš správne.</li>
+                <li>Po správnej odpovedi sa bod zmení na zelený a získaš body.</li>
+            </ul>
+
+            <h3>⭐ Bodovanie</h3>
+            <ul>
+                <li>1. pokus → <strong>10 bodov</strong></li>
+                <li>2. pokus → <strong>5 bodov</strong></li>
+                <li>3. pokus → <strong>2 body</strong></li>
+                <li>4. a viac → 0 bodov</li>
+            </ul>
+
+            <h3>🏆 Leaderboard</h3>
+            <p>Zadaj svoje meno v pravom paneli a ulož ho – tvoje skóre sa bude automaticky pridávať do online rebríčka.</p>
+
+            <button class="btn" type="button" onclick="closeRules()" style="margin-top:14px">Začať hrať!</button>
+        </div>
     </div>
 
     <div class="app-layout">
         <div class="main-stage">
             <div class="content">
                 <div class="game-ui">
-                    <div>⭐ Skóre: <span id="score">0</span></div>
-                    <div>📍 Navštívené: <span id="visited">0</span></div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">⭐</span>
+                        <div>
+                            <div class="stat-label">Skóre</div>
+                            <div class="stat-value"><span id="score">0</span></div>
+                        </div>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">📍</span>
+                        <div>
+                            <div class="stat-label">Navštívené</div>
+                            <div class="stat-value"><span id="visited">0</span></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="controls" style="margin-bottom:8px;">
@@ -128,6 +186,13 @@
 
                 </div>
 
+                <div class="legend">
+                    <span class="legend-item"><span class="legend-dot city"></span> Mesto</span>
+                    <span class="legend-item"><span class="legend-dot capital"></span> Krajské mesto</span>
+                    <span class="legend-item"><span class="legend-dot correct"></span> Správne</span>
+                    <span class="legend-item"><span class="legend-dot wrong"></span> Nesprávne</span>
+                </div>
+
                 <div id="popup" class="popup">
                     <div class="popup-content">
                         <span class="close" onclick="closePopup()">&times;</span>
@@ -140,40 +205,24 @@
                     </div>
                 </div>
             </div>
-            
             <div class="aside">
     <div class="text-illustration">
-        <h3 style="color: white;">ukážka</h3>
+        <h3>ukážka</h3>
         <p class="text"></p>
-    </div>
-    <div class="aside">
-        <div class="legend">
-    <h3>🎨 Legenda</h3>
-    <div class="legend-item">
-        <span class="legend-color blue"></span> Nezodpovedané
-    </div>
-    <div class="legend-item">
-        <span class="legend-color green"></span> Správne
-    </div>
-    <div class="legend-item">
-        <span class="legend-color red"></span> Nesprávne
-    </div>
-</div>
     </div>
 
     <div id="sidebar">
         <h3>🏆 Leaderboard</h3>
 
-
         <div class="player-box">
-            <label for="player-name" style="color: #333;">Meno hráča</label>
-            <input id="player-name" type="text" placeholder="Zadaj meno" style="color: #000; border: 1px solid #ccc;" />
-            <button id="save-name-btn" type="button">Uložiť meno</button>
-            <div id="name-status" style="color: #333;"></div>
-            <div id="session-hint" style="font-size:12px; opacity:.7; margin-top:6px; color: #333;"></div>
+            <label for="player-name">Meno hráča</label>
+            <input id="player-name" type="text" placeholder="Zadaj meno" />
+            <button id="save-name-btn" type="button">💾 Uložiť meno</button>
+            <div id="name-status"></div>
+            <div id="session-hint"></div>
         </div>
 
-        <ul id="leaderboard" style="color: #333; list-style: none; padding: 0;"></ul>
+        <ul id="leaderboard"></ul>
     </div>
 </div>
 
@@ -190,27 +239,49 @@
 <script src="./questions_sets/questions_set_19_7.js"></script>
 
 <script>
-    var questions = {};
-    var score = 0;
-    var visitedCities = new Set();
-    var answeredCities = new Set();
-    var attempts = {};
-    var currentCity = null;
-    var currentPoint = null;
-    var cityQuestion = {}; 
-    var usedQuestions = new Set();
-    var allQuestionsPool = [];// stores the chosen question per city
+    /* ===== THEME TOGGLE ===== */
+    (function initTheme() {
+        const saved = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", saved);
+        const icon = document.getElementById("theme-icon");
+        if (icon) icon.textContent = saved === "light" ? "☀️" : "🌙";
+    })();
+
+    document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        const next = cur === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+        document.getElementById("theme-icon").textContent = next === "light" ? "☀️" : "🌙";
+    });
+
+    /* ===== RULES MODAL ===== */
+    function openRules() { document.getElementById("rules-popup").style.display = "flex"; }
+    function closeRules() { document.getElementById("rules-popup").style.display = "none"; }
+    window.closeRules = closeRules;
+    document.getElementById("rules-btn")?.addEventListener("click", openRules);
+    document.getElementById("rules-popup")?.addEventListener("click", (e) => {
+        if (e.target.id === "rules-popup") closeRules();
+    });
+
+    let questions = {};
+    let score = 0;
+    let visitedCities = new Set();
+    let answeredCities = new Set();
+    let attempts = {};
+    let currentCity = null;
+    let currentPoint = null;
     
 
     const $ = id => document.getElementById(id); 
 
-    window.markPointsWithoutQuestions = function() {
+    function markPointsWithoutQuestions() {
         document.querySelectorAll(".point").forEach(p => {
             const city = p.dataset.city;
             const hasQuestion = !!(questions && questions[city]);
             p.classList.toggle("no-question", !hasQuestion);
         });
-    };
+        }
     function normalizeText(s) {
             return String(s || "")
                 .trim()
@@ -270,42 +341,16 @@
     }
 
     function useQuestionSet(name) {
-    if (window[name]) questions = window[name];
-
-    cityQuestion = {};
-    usedQuestions = new Set();
-    allQuestionsPool = [];
-
-    let idCounter = 0;
-
-    // 👉 собираем ВСЕ вопросы в один массив
-    for (const city in questions) {
-        const qData = questions[city];
-
-        if (Array.isArray(qData)) {
-            qData.forEach(q => {
-                q._id = "q_" + (idCounter++);
-                q._city = city; // запомним город
-                allQuestionsPool.push(q);
-            });
-        } else if (typeof qData === "object") {
-            qData._id = "q_" + (idCounter++);
-            qData._city = city;
-            allQuestionsPool.push(qData);
-        }
+        if (window[name]) questions = window[name];
+        document.querySelectorAll(".text").forEach(p => {
+            p.innerHTML = questions.text;
+        });
+        markPointsWithoutQuestions();
     }
-
-    document.querySelectorAll(".text").forEach(p => {
-        p.innerHTML = questions.text;
-    });
-
-    markPointsWithoutQuestions();
-}
 
     const selectEl = $("question-set-select");
     useQuestionSet(selectEl.value);
-    window.localChangeHandler = e =>useQuestionSet(e.target.value);
-    selectEl.addEventListener("change", window.localChangeHandler);
+    selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
 
     document.querySelectorAll(".point").forEach(p => {
         p.addEventListener("click", () => showTask(p.dataset.city, p));
@@ -331,29 +376,14 @@
         const cityQuestions = questions[city];
         if (!cityQuestions) return;
 
-        // Pick question once per city, reuse on reopen
-        if (!cityQuestion[city]) {
-
-    // фильтр неиспользованных
-    let available = allQuestionsPool.filter(q => !usedQuestions.has(q._id));
-
-    if (available.length === 0) {
-        $("question-text").innerText = "Už nie sú ďalšie otázky 😅";
-        return;
-    }
-
-    const randomQ = available[Math.floor(Math.random() * available.length)];
-
-    cityQuestion[city] = randomQ;
-    usedQuestions.add(randomQ._id);
-}
-        const q = cityQuestion[city];
+        const q = Array.isArray(cityQuestions)
+            ? cityQuestions[Math.floor(Math.random() * cityQuestions.length)]
+            : cityQuestions;
 
         $("task-title").innerText = "Úloha pre mesto " + city;
         $("question-text").innerText = q.question;
         $("choices").innerHTML = "";
         $("feedback").innerText = "";
-        $("submit-answer").onclick = null;
 
         if (q.type === "choice") renderChoiceQuestion(q);
         if (q.type === "fill") renderFillQuestion(q);
@@ -402,7 +432,6 @@
                 answeredCities.add(currentCity);
             } else {
                 chosen.classList.add("wrong");
-                currentPoint.classList.remove("correct");
                 currentPoint.classList.add("wrong");
                 $("feedback").innerText = "Nesprávne, skús znova";
             }
@@ -481,7 +510,6 @@
             $("feedback").innerText = `Správne (${percent}%)! +${pts}`;
             answeredCities.add(currentCity);
         } else {
-            currentPoint.classList.remove("correct");
             currentPoint.classList.add("wrong");
             $("feedback").innerText = "Niektoré odpovede sú zlé";
         }
@@ -516,7 +544,6 @@
                 answeredCities.add(currentCity);
             } else {
                 inp.style.background = "#ffcdd2";
-                currentPoint.classList.remove("correct");
                 currentPoint.classList.add("wrong");
                 $("feedback").innerText = "Nesprávne";
             }
@@ -533,15 +560,17 @@
 
         const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ===================== [ADDED START] SESSION ID (unique per user run) =====================
         const SESSION_KEY = "leaderboard_session_id";
-        let sessionId = sessionStorage.getItem(SESSION_KEY);
+        let sessionId = localStorage.getItem(SESSION_KEY);
         if (!sessionId) {
             sessionId = crypto.randomUUID();
-            sessionStorage.setItem(SESSION_KEY, sessionId);
+            localStorage.setItem(SESSION_KEY, sessionId);
         }
 
         const sessionHintEl = document.getElementById("session-hint");
         if (sessionHintEl) sessionHintEl.textContent = `session: ${sessionId.slice(0, 8)}…`;
+        // ===================== [ADDED END] SESSION ID (unique per user run) =====================
 
         const nameInput = document.getElementById("player-name");
         const saveBtn = document.getElementById("save-name-btn");
@@ -638,81 +667,7 @@
         }
 
         window.upsertScore = upsertScore;
-        async function fetchExams() {
-            const { data, error } = await sb.from("exams").select("id, title, year").order("year", { ascending: false });
-            if (data && data.length > 0) {
-                const sel = document.getElementById("question-set-select");
-                sel.innerHTML = "";
-                data.forEach(exam => {
-                    const opt = document.createElement("option");
-                    opt.value = exam.id;
-                    opt.textContent = `${exam.year} - ${exam.title}`;
-                    sel.appendChild(opt);
-                });
-
-                if (window.localChangeHandler) {
-                    sel.removeEventListener("change", window.localChangeHandler);
-                }
-
-                sel.addEventListener("change", async (e) => {
-                    await loadQuestionsFromSupabase(e.target.value);
-                });
-
-                await loadQuestionsFromSupabase(data[0].id);
-            }
-        }
-
-        async function loadQuestionsFromSupabase(examId) {
-            console.log("Loading questions for exam:", examId);
-            const { data: snippets } = await sb.from("snippets").select("id, content").eq("exam_id", examId).limit(1);
-            if (!snippets || snippets.length === 0) return;
-
-            const snippetId = snippets[0].id;
-            const textContent = snippets[0].content;
-
-            const { data: qData } = await sb.from("questions").select("*").eq("snippet_id", snippetId);
-
-            if (qData) {
-                let newQuestions = { text: textContent };
-                qData.forEach(row => {
-                    const qObj = {
-                        type: row.question_type,
-                        question: row.question_text,
-                        sentence: row.context_sentence,
-                        choices: row.options
-                    };
-                    if (qObj.type === "choice") {
-                        qObj.correct = Array.isArray(row.correct_answers) ? row.correct_answers[0] : row.correct_answers;
-                    } else if (qObj.type === "openAnswer" || qObj.type === "fill") {
-                        qObj.answers = row.correct_answers;
-                    }
-
-                    if (newQuestions[row.city_key]) {
-                        if (Array.isArray(newQuestions[row.city_key])) {
-                            newQuestions[row.city_key].push(qObj);
-                        } else {
-                            newQuestions[row.city_key] = [newQuestions[row.city_key], qObj];
-                        }
-                    } else {
-                        newQuestions[row.city_key] = qObj;
-                    }
-                });
-
-                window.questions = newQuestions;
-                window.cityQuestion = {};
-                document.querySelectorAll(".text").forEach(p => {
-                    p.innerHTML = newQuestions.text || "";
-                });
-                if (window.markPointsWithoutQuestions) {
-                    window.markPointsWithoutQuestions();
-                }
-            }
-        }
-
-        window.addEventListener("load", async () => {
-            await loadLeaderboard();
-            await fetchExams();
-        });
+        window.addEventListener("load", loadLeaderboard);
     </script>
 </body>
 
