@@ -82,8 +82,8 @@
                 </div>
 
                 <div class="controls" style="margin-bottom:8px;">
-                    <label for="question-set-select">Vyber sadu otázok:</label>
-                    <select id="question-set-select" data-testid="exam-select">
+                    <label for="question-set-select">Vyber ukážku:</label>
+                    <select id="question-set-select" data-testid="ukazka-select">
                         <option value="">Načítavam…</option>
                     </select>
                 </div>
@@ -640,49 +640,55 @@
         }
         window.upsertScore = upsertScore;
 
-        // ===================== EXAMS + SNIPPETS + QUESTIONS =====================
-        async function fetchExams() {
-            const { data, error } = await sb
-                .from("exams")
-                .select("id, title, year")
-                .order("year", { ascending: false });
+        // ===================== UKAZKY (snippets) + QUESTIONS =====================
+        async function fetchUkazky() {
+            // tiahneme snippets + exams (pre pekné labelovanie)
+            const [snipsRes, examsRes] = await Promise.all([
+                sb.from("snippets")
+                    .select("id, exam_id, snippet_number, content")
+                    .order("exam_id", { ascending: true })
+                    .order("snippet_number", { ascending: true }),
+                sb.from("exams").select("id, title, year"),
+            ]);
 
             const sel = document.getElementById("question-set-select");
-            if (error || !data || data.length === 0) {
-                console.error("fetchExams error:", error);
+
+            if (snipsRes.error || !snipsRes.data || snipsRes.data.length === 0) {
+                console.error("fetchUkazky error:", snipsRes.error);
                 if (sel) sel.innerHTML = `<option value="">Žiadne ukážky</option>`;
                 return;
             }
 
+            const examMap = {};
+            (examsRes.data || []).forEach(e => { examMap[e.id] = e; });
+
             sel.innerHTML = "";
-            data.forEach(exam => {
+            snipsRes.data.forEach(snip => {
+                const exam = examMap[snip.exam_id];
+                const yearPart = exam ? `${exam.year}` : "";
+                const titlePart = exam ? exam.title : "Ukážka";
+                const numPart = snip.snippet_number != null ? `Ukážka ${snip.snippet_number}` : `Ukážka #${snip.id}`;
                 const opt = document.createElement("option");
-                opt.value = exam.id;
-                opt.textContent = `${exam.year} - ${exam.title}`;
+                opt.value = snip.id;
+                opt.textContent = yearPart
+                    ? `${yearPart} · ${titlePart} · ${numPart}`
+                    : numPart;
+                opt.dataset.content = snip.content;
                 sel.appendChild(opt);
             });
 
             sel.addEventListener("change", async (e) => {
-                await loadQuestionsFromSupabase(e.target.value);
+                await loadQuestionsForSnippet(e.target.value);
             });
 
-            await loadQuestionsFromSupabase(data[0].id);
+            await loadQuestionsForSnippet(snipsRes.data[0].id);
         }
 
-        async function loadQuestionsFromSupabase(examId) {
-            const { data: snippets, error: sErr } = await sb
-                .from("snippets")
-                .select("id, content")
-                .eq("exam_id", examId)
-                .limit(1);
-
-            if (sErr || !snippets || snippets.length === 0) {
-                console.warn("No snippet for exam", examId, sErr);
-                return;
-            }
-
-            const snippetId = snippets[0].id;
-            const textContent = snippets[0].content;
+        async function loadQuestionsForSnippet(snippetId) {
+            // text ukážky berieme z option.dataset.content (uložené pri fetchUkazky)
+            const sel = document.getElementById("question-set-select");
+            const opt = sel?.querySelector(`option[value="${snippetId}"]`);
+            const textContent = opt?.dataset?.content || "";
 
             const { data: qData, error: qErr } = await sb
                 .from("questions")
@@ -721,7 +727,7 @@
 
         window.addEventListener("load", async () => {
             await loadLeaderboard();
-            await fetchExams();
+            await fetchUkazky();
         });
     </script>
 </body>
