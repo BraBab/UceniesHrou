@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ucenie sa Hrou</title>
+    <title>MaturitaBoost</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>🎓 Ucenia sa hrou</h1>
+            <h1>🚀 MaturitaBoost</h1>
             <div class="header-actions">
                 <button id="rules-btn" class="btn" type="button" title="Pravidlá hry">
                     <span>📖</span><span>Pravidlá</span>
@@ -28,7 +28,7 @@
         <div class="popup-content">
             <span class="close" onclick="closeRules()">&times;</span>
             <h2>📖 Pravidlá hry</h2>
-            <p>Vitaj v hre <strong>Ucenia sa hrou</strong> – interaktívna mapa Slovenska na precvičovanie poznatkov!</p>
+            <p>Vitaj v hre <strong>MaturitaBoost</strong> – interaktívna mapa Slovenska na precvičovanie poznatkov!</p>
 
             <h3>🗺️ Mapa a body</h3>
             <ul>
@@ -83,9 +83,8 @@
 
                 <div class="controls" style="margin-bottom:8px;">
                     <label for="question-set-select">Vyber sadu otázok:</label>
-                    <select id="question-set-select">
-                        <option value="questions_set_19_8" selected>2019 - ukážka 8</option>
-                        <option value="questions_set_19_7">2019 - ukážka 7</option>
+                    <select id="question-set-select" data-testid="exam-select">
+                        <option value="">Načítavam…</option>
                     </select>
                 </div>
 
@@ -193,6 +192,19 @@
                     <span class="legend-item"><span class="legend-dot wrong"></span> Nesprávne</span>
                 </div>
 
+                <!-- FAST GAME CTA -->
+                <a href="./fast.html" class="fast-cta" data-testid="fast-game-link">
+                    <div class="fast-cta-bg"></div>
+                    <div class="fast-cta-content">
+                        <div class="fast-cta-icon">⚡</div>
+                        <div class="fast-cta-text">
+                            <div class="fast-cta-title">Fast Game</div>
+                            <div class="fast-cta-sub">Hra na čas · streak bonusy · online ukážky</div>
+                        </div>
+                        <div class="fast-cta-arrow">→</div>
+                    </div>
+                </a>
+
                 <div id="popup" class="popup">
                     <div class="popup-content">
                         <span class="close" onclick="closePopup()">&times;</span>
@@ -235,10 +247,7 @@
             <p>made by spsd ke hlavna 113</p>
         </footer>
     </div>
-    <script src="./questions_sets/questions_set_19_8.js"></script>
-<script src="./questions_sets/questions_set_19_7.js"></script>
-
-<script>
+    <script>
     /* ===== THEME TOGGLE ===== */
     (function initTheme() {
         const saved = localStorage.getItem("theme") || "dark";
@@ -340,17 +349,15 @@
         $("score").classList.add("score-anim");
     }
 
-    function useQuestionSet(name) {
-        if (window[name]) questions = window[name];
+    function useQuestionSet(setObj) {
+        if (setObj) questions = setObj;
         document.querySelectorAll(".text").forEach(p => {
-            p.innerHTML = questions.text;
+            p.innerHTML = (questions && questions.text) ? questions.text : "";
         });
         markPointsWithoutQuestions();
     }
-
-    const selectEl = $("question-set-select");
-    useQuestionSet(selectEl.value);
-    selectEl.addEventListener("change", e => useQuestionSet(e.target.value));
+    window.markPointsWithoutQuestions = markPointsWithoutQuestions;
+    window.useQuestionSet = useQuestionSet;
 
     document.querySelectorAll(".point").forEach(p => {
         p.addEventListener("click", () => showTask(p.dataset.city, p));
@@ -559,18 +566,17 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5enZkZGlvcm9jcXVrdHFscGVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Njc1NjAsImV4cCI6MjA4NjA0MzU2MH0._Xpv1TDkXCYjA34CPnXzqDOIX84-0KRYpISoqZcid64";
 
         const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.sb = sb;
 
-        // ===================== [ADDED START] SESSION ID (unique per user run) =====================
+        // ===================== SESSION ID (unique per user run) =====================
         const SESSION_KEY = "leaderboard_session_id";
         let sessionId = localStorage.getItem(SESSION_KEY);
         if (!sessionId) {
             sessionId = crypto.randomUUID();
             localStorage.setItem(SESSION_KEY, sessionId);
         }
-
         const sessionHintEl = document.getElementById("session-hint");
         if (sessionHintEl) sessionHintEl.textContent = `session: ${sessionId.slice(0, 8)}…`;
-        // ===================== [ADDED END] SESSION ID (unique per user run) =====================
 
         const nameInput = document.getElementById("player-name");
         const saveBtn = document.getElementById("save-name-btn");
@@ -579,21 +585,12 @@
         const savedName = localStorage.getItem("player_name");
         if (savedName && nameInput) nameInput.value = savedName;
 
-        function setStatus(msg) {
-            if (!statusEl) return;
-            statusEl.textContent = msg || "";
-        }
-
-        function getPlayerName() {
-            return (nameInput?.value || "").trim();
-        }
+        function setStatus(msg) { if (statusEl) statusEl.textContent = msg || ""; }
+        function getPlayerName() { return (nameInput?.value || "").trim(); }
 
         function saveName() {
             const name = getPlayerName();
-            if (!name) {
-                setStatus("Najprv zadaj meno.");
-                return false;
-            }
+            if (!name) { setStatus("Najprv zadaj meno."); return false; }
             localStorage.setItem("player_name", name);
             setStatus(`Meno uložené: ${name}`);
             return true;
@@ -601,14 +598,9 @@
 
         saveBtn?.addEventListener("click", saveName);
         nameInput?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                saveName();
-            }
+            if (e.key === "Enter") { e.preventDefault(); saveName(); }
         });
-        nameInput?.addEventListener("blur", () => {
-            if (getPlayerName()) saveName();
-        });
+        nameInput?.addEventListener("blur", () => { if (getPlayerName()) saveName(); });
 
         async function loadLeaderboard() {
             const { data, error } = await sb
@@ -617,15 +609,9 @@
                 .order("score", { ascending: false })
                 .limit(10);
 
-            if (error) {
-                console.error("loadLeaderboard error:", error);
-                setStatus(`Chyba: ${error.message}`);
-                return;
-            }
-
+            if (error) { console.error("loadLeaderboard error:", error); return; }
             const ul = document.getElementById("leaderboard");
             if (!ul) return;
-
             ul.innerHTML = "";
             data.forEach(row => {
                 const li = document.createElement("li");
@@ -635,39 +621,108 @@
         }
 
         let lastWriteAt = 0;
-
         async function upsertScore(delta = 10) {
             const name = getPlayerName();
-            if (!name) {
-                setStatus("Najprv zadaj meno.");
-                return;
-            }
+            if (!name) { setStatus("Najprv zadaj meno."); return; }
             if (!Number.isFinite(delta) || delta <= 0) return;
-
             const now = Date.now();
             if (now - lastWriteAt < 250) return;
             lastWriteAt = now;
 
-            // ===================== [CHANGED START] RPC -> upsert by session_id, not by name =====================
             const { error } = await sb.rpc("upsert_score_session", {
                 p_session_id: sessionId,
                 p_name: name,
                 p_delta: delta
             });
-            // ===================== [CHANGED END] RPC -> upsert by session_id, not by name =====================
-
-            if (error) {
-                console.error("upsert_score_session rpc error:", error);
-                setStatus(`Chyba: ${error.message}`);
-                return;
-            }
-
+            if (error) { console.error("upsert_score_session error:", error); return; }
             setStatus(`Skóre uložené: +${delta}`);
             await loadLeaderboard();
         }
-
         window.upsertScore = upsertScore;
-        window.addEventListener("load", loadLeaderboard);
+
+        // ===================== EXAMS + SNIPPETS + QUESTIONS =====================
+        async function fetchExams() {
+            const { data, error } = await sb
+                .from("exams")
+                .select("id, title, year")
+                .order("year", { ascending: false });
+
+            const sel = document.getElementById("question-set-select");
+            if (error || !data || data.length === 0) {
+                console.error("fetchExams error:", error);
+                if (sel) sel.innerHTML = `<option value="">Žiadne ukážky</option>`;
+                return;
+            }
+
+            sel.innerHTML = "";
+            data.forEach(exam => {
+                const opt = document.createElement("option");
+                opt.value = exam.id;
+                opt.textContent = `${exam.year} - ${exam.title}`;
+                sel.appendChild(opt);
+            });
+
+            sel.addEventListener("change", async (e) => {
+                await loadQuestionsFromSupabase(e.target.value);
+            });
+
+            await loadQuestionsFromSupabase(data[0].id);
+        }
+
+        async function loadQuestionsFromSupabase(examId) {
+            const { data: snippets, error: sErr } = await sb
+                .from("snippets")
+                .select("id, content")
+                .eq("exam_id", examId)
+                .limit(1);
+
+            if (sErr || !snippets || snippets.length === 0) {
+                console.warn("No snippet for exam", examId, sErr);
+                return;
+            }
+
+            const snippetId = snippets[0].id;
+            const textContent = snippets[0].content;
+
+            const { data: qData, error: qErr } = await sb
+                .from("questions")
+                .select("*")
+                .eq("snippet_id", snippetId);
+
+            if (qErr) { console.error("questions fetch error:", qErr); return; }
+
+            const newQuestions = { text: textContent };
+            (qData || []).forEach(row => {
+                const qObj = {
+                    type: row.question_type,
+                    question: row.question_text,
+                    sentence: row.context_sentence,
+                    choices: row.options
+                };
+                if (qObj.type === "choice") {
+                    qObj.correct = Array.isArray(row.correct_answers) ? row.correct_answers[0] : row.correct_answers;
+                } else if (qObj.type === "openAnswer" || qObj.type === "fill") {
+                    qObj.answers = row.correct_answers;
+                }
+
+                if (newQuestions[row.city_key]) {
+                    if (Array.isArray(newQuestions[row.city_key])) {
+                        newQuestions[row.city_key].push(qObj);
+                    } else {
+                        newQuestions[row.city_key] = [newQuestions[row.city_key], qObj];
+                    }
+                } else {
+                    newQuestions[row.city_key] = qObj;
+                }
+            });
+
+            if (window.useQuestionSet) window.useQuestionSet(newQuestions);
+        }
+
+        window.addEventListener("load", async () => {
+            await loadLeaderboard();
+            await fetchExams();
+        });
     </script>
 </body>
 
