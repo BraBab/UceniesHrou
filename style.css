@@ -902,7 +902,7 @@ input.open-answer-input {
 }
 [data-theme="light"] .timer-zones { color: rgba(15, 23, 42, 0.7); }
 .timer-zone {
-    text-align: right;
+    text-align: left;
     padding: 0 6px;
     border-radius: 4px 4px 0 0;
     line-height: 1;
